@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+@plugin "daisyui";
+
+
+@theme {
+  
+}
+
+/* ===================================
+   THÈME BLANC (Light/Default)
+   =================================== */
+[data-theme="light"] {
+  --color-primary: #3b82f6;
+  --color-primary-focus: #2563eb;
+  --color-primary-content: #ffffff;
+  
+  --color-secondary: #6366f1;
+  --color-secondary-focus: #4f46e5;
+  --color-secondary-content: #ffffff;
+  
+  --color-accent: #f59e0b;
+  --color-accent-focus: #d97706;
+  --color-accent-content: #ffffff;
+  
+  --color-neutral: #f3f4f6;
+  --color-neutral-focus: #e5e7eb;
+  --color-neutral-content: #1f2937;
+  
+  --color-base-100: #ffffff;
+  --color-base-200: #f9fafb;
+  --color-base-300: #f3f4f6;
+  --color-base-content: #1f2937;
+  
+  --color-info: #3b82f6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+/* ===================================
+   THÈME NOIR (Dark)
+   =================================== */
+[data-theme="dark"] {
+  --color-primary: #60a5fa;
+  --color-primary-focus: #3b82f6;
+  --color-primary-content: #000000;
+  
+  --color-secondary: #818cf8;
+  --color-secondary-focus: #6366f1;
+  --color-secondary-content: #000000;
+  
+  --color-accent: #fbbf24;
+  --color-accent-focus: #f59e0b;
+  --color-accent-content: #000000;
+  
+  --color-neutral: #374151;
+  --color-neutral-focus: #1f2937;
+  --color-neutral-content: #d1d5db;
+  
+  --color-base-100: #1f2937;
+  --color-base-200: #111827;
+  --color-base-300: #0f172a;
+  --color-base-content: #f9fafb;
+  
+  --color-info: #60a5fa;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+/* ===================================
+   THÈME PREMIUM (Luxury/Gold)
+   =================================== */
+[data-theme="premium"] {
+  --color-primary: #d4af37;
+  --color-primary-focus: #b8941e;
+  --color-primary-content: #1a1410;
+  
+  --color-secondary: #2d3748;
+  --color-secondary-focus: #1a202c;
+  --color-secondary-content: #f7fafc;
+  
+  --color-accent: #e5c185;
+  --color-accent-focus: #d4af37;
+  --color-accent-content: #1a1410;
+  
+  --color-neutral: #2d3748;
+  --color-neutral-focus: #1a202c;
+  --color-neutral-content: #cbd5e0;
+  
+  --color-base-100: #1a1410;
+  --color-base-200: #0f0d0a;
+  --color-base-300: #000000;
+  --color-base-content: #f7f6f4;
+  
+  --color-info: #63b3ed;
+  --color-success: #48bb78;
+  --color-warning: #d4af37;
+  --color-error: #fc8181;
+  
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+/* ===================================
+   STYLES GLOBAUX
+   =================================== */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Amélioration des boutons selon le thème */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-focus);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-secondary-content);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-accent-content);
+}
+
+/* Cartes et surfaces */
+.card {
+  background-color: var(--color-base-200);
+  color: var(--color-base-content);
+}
+
+/* Bordures adaptatives */
+.border-neutral {
+  border-color: var(--color-neutral);
+}
+
+/* Texte adaptatif */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+/* Premium effects */
+[data-theme="premium"] .premium-glow {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+[data-theme="premium"] h1,
+[data-theme="premium"] h2,
+[data-theme="premium"] h3 {
+  background: linear-gradient(135deg, #d4af37 0%, #e5c185 50%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
