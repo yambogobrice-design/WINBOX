@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 // Liens du sous-menu "Ressources"
 const liensRessources = [
@@ -12,6 +14,8 @@ const liensRessources = [
 ];
 
 const NavBar = () => {
+  const router = useRouter();
+  const { utilisateur, estConnecte, deconnexion } = useAuthContext();
   const [showRessources, setShowRessources] = useState(false);
   const [menuOuvert, setMenuOuvert] = useState(false);
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -24,6 +28,12 @@ const NavBar = () => {
   }, [menuOuvert]);
 
   const fermerMenu = () => setMenuOuvert(false);
+
+  const handleDeconnexion = () => {
+    deconnexion();
+    fermerMenu();
+    router.push('/');
+  };
 
   const handleMouseEnter = () => {
     if (dropdownTimeout) {
@@ -194,24 +204,54 @@ const NavBar = () => {
                   </svg>
                 </button>
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-black/10 rounded-md shadow-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <Link prefetch={true} href="/Profil"
-                    className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
-                  >
-                    Profil
-                  </Link>
-                  <Link prefetch={true} href="/Favoris"
-                    className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
-                  >
-                    Mes Favoris
-                  </Link>
-                  <Link prefetch={true} href="/Admin/Dashboard"
-                    className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
-                  >
-                    Administration
-                  </Link>
-                  <button className="w-full text-left px-4 py-3 text-sm hover:bg-black/5 transition-colors text-black/60">
-                    Déconnexion
-                  </button>
+                  {estConnecte ? (
+                    <>
+                      {utilisateur && (
+                        <div className="px-4 py-3 border-b border-black/5 bg-black/5">
+                          <p className="text-sm font-bold text-black truncate">
+                            {utilisateur.prenom} {utilisateur.nom}
+                          </p>
+                          <p className="text-xs text-black/60 truncate">{utilisateur.email}</p>
+                        </div>
+                      )}
+                      <Link prefetch={true} href="/Profil"
+                        className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
+                      >
+                        Profil
+                      </Link>
+                      <Link prefetch={true} href="/Favoris"
+                        className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
+                      >
+                        Mes Favoris
+                      </Link>
+                      {utilisateur?.role === "admin" && (
+                        <Link prefetch={true} href="/Admin/Dashboard"
+                          className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5"
+                        >
+                          Administration
+                        </Link>
+                      )}
+                      <button 
+                        onClick={handleDeconnexion}
+                        className="w-full text-left px-4 py-3 text-sm hover:bg-black/5 transition-colors text-black/60"
+                      >
+                        Déconnexion
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link prefetch={true} href="/Connexion"
+                        className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors border-b border-black/5 font-medium"
+                      >
+                        Se connecter
+                      </Link>
+                      <Link prefetch={true} href="/Inscription"
+                        className="block px-4 py-3 text-sm hover:bg-black/5 transition-colors font-medium"
+                      >
+                        S&apos;inscrire
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -407,15 +447,39 @@ const NavBar = () => {
 
           {/* Admin & Déconnexion */}
           <div className="mt-8 pt-6 border-t border-black/10 space-y-2">
-            <Link prefetch={true} href="/Admin/Dashboard"
-              onClick={fermerMenu}
-              className="block px-4 py-3 text-sm text-center border border-white/20 hover:bg-black/5 rounded-md transition-all"
-            >
-              Administration
-            </Link>
-            <button className="w-full px-4 py-3 text-sm text-center text-black/60 hover:bg-black/5 rounded-md transition-all">
-              Déconnexion
-            </button>
+            {estConnecte ? (
+              <>
+                {utilisateur?.role === "admin" && (
+                  <Link prefetch={true} href="/Admin/Dashboard"
+                    onClick={fermerMenu}
+                    className="block px-4 py-3 text-sm text-center border border-white/20 hover:bg-black/5 rounded-md transition-all"
+                  >
+                    Administration
+                  </Link>
+                )}
+                <button 
+                  onClick={handleDeconnexion}
+                  className="w-full px-4 py-3 text-sm text-center text-black/60 hover:bg-black/5 rounded-md transition-all"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <>
+                <Link prefetch={true} href="/Connexion"
+                  onClick={fermerMenu}
+                  className="block px-4 py-3 text-sm text-center bg-black text-white hover:bg-gray-800 rounded-md transition-all font-medium"
+                >
+                  Se connecter
+                </Link>
+                <Link prefetch={true} href="/Inscription"
+                  onClick={fermerMenu}
+                  className="block px-4 py-3 text-sm text-center border border-white/20 hover:bg-black/5 rounded-md transition-all"
+                >
+                  S&apos;inscrire
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </aside>

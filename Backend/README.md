@@ -2,50 +2,32 @@
 
 Backend Node.js + Express + MySQL pour la plateforme académique WinBox.
 
+> 📖 Référence complète des endpoints, conventions et correspondance avec les
+> pages du frontend : **[API.md](./API.md)**
+
 ## 📋 Prérequis
 
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0
-- **MySQL** >= 8.0
-- **Git**
+- **MySQL** >= 8.0 (ou MariaDB 10.4+)
 
 ## 🛠️ Installation
 
-### 1. Cloner le projet
+### 1. Dépendances
+
 ```bash
 cd Backend
-```
-
-### 2. Installer les dépendances
-```bash
 npm install
 ```
 
-### 3. Configuration de la base de données
+### 2. Variables d'environnement
 
-#### Créer la base de données MySQL
-```bash
-mysql -u root -p
-```
-
-Ensuite exécuter le script SQL :
-```sql
-source src/config/database.sql
-```
-
-Ou via la ligne de commande :
-```bash
-mysql -u root -p < src/config/database.sql
-```
-
-### 4. Configuration de l'environnement
-
-Copier le fichier `.env.example` vers `.env` :
 ```bash
 cp .env.example .env
 ```
 
-Puis éditer `.env` avec vos paramètres :
+Puis renseignez au minimum `DB_PASSWORD` et `JWT_SECRET` :
+
 ```env
 NODE_ENV=development
 PORT=5000
@@ -60,236 +42,171 @@ JWT_SECRET=generer_une_cle_securisee_ici
 JWT_EXPIRE=7d
 
 CORS_ORIGIN=http://localhost:3000
+FRONTEND_URL=http://localhost:3000
 ```
+
+Générer une clé JWT :
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+### 3. Base de données
+
+```bash
+npm run db:init   # crée la base, les 19 tables, les vues et les données de référence
+npm run seed      # crée le compte administrateur (mot de passe haché par bcrypt)
+```
+
+`db:init` est idempotent : le script SQL peut être rejoué sans erreur.
+Le compte par défaut est `admin@winbox.com` / `Admin@123` — **à changer**
+(`ADMIN_EMAIL` / `ADMIN_PASSWORD` dans `.env`), ainsi qu'après la première connexion.
 
 ## 🚀 Démarrage
 
-### Mode développement (avec hot reload)
 ```bash
-npm run dev
+npm run dev     # développement, rechargement automatique (nodemon)
+npm start       # production
 ```
 
-### Mode production
-```bash
-npm start
-```
+Le serveur écoute sur `http://localhost:5000` :
 
-Le serveur démarrera sur `http://localhost:5000`
+- `GET /health` — état du service
+- `GET /api/v1` — liste des domaines exposés
+- `/uploads/<fichier>` — fichiers déposés
 
-## 📡 Endpoints API
+## 📜 Scripts
 
-### Base URL
-```
-http://localhost:5000/api/v1
-```
+| Script | Rôle |
+|---|---|
+| `npm start` | Démarre le serveur |
+| `npm run dev` | Démarre avec nodemon |
+| `npm run db:init` | Applique `src/config/database.sql` |
+| `npm run seed` | Crée/actualise le compte administrateur |
+| `npm run verify` | Vérifications statiques (sans base ni dépendances) |
+| `npm test` | Identique à `npm run verify` |
 
-### 🔐 Authentification
+`npm run verify` contrôle la syntaxe de chaque fichier, la résolution des imports
+et l'existence des exportations, la cohérence des tables/colonnes citées avec le
+schéma SQL, et affiche l'inventaire des routes exposées.
 
-#### Inscription
-```http
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-  "nom": "Doe",
-  "prenom": "John",
-  "email": "john@example.com",
-  "password": "motdepasse123",
-  "telephone": "+226 70591159",
-  "niveau": "Licence 2",
-  "filiere": "Informatique",
-  "institution": "Université de Ouagadougou"
-}
-```
-
-#### Connexion
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "motdepasse123"
-}
-```
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "message": "Connexion réussie",
-  "data": {
-    "user": { ... },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
-#### Profil utilisateur
-```http
-GET /api/v1/auth/me
-Authorization: Bearer {token}
-```
-
-### 📚 Ressources
-
-#### Lister les ressources
-```http
-GET /api/v1/resources?page=1&limit=20&type=livre&search=mathématiques
-```
-
-**Paramètres de requête:**
-- `page` : Numéro de page (défaut: 1)
-- `limit` : Nombre de résultats par page (défaut: 20)
-- `type` : Type de ressource (livre, cours, sujet, correction, support)
-- `category_id` : ID de la catégorie
-- `niveau` : Niveau académique
-- `filiere` : Filière
-- `search` : Recherche textuelle
-
-#### Obtenir une ressource
-```http
-GET /api/v1/resources/:id
-```
-
-#### Créer une ressource
-```http
-POST /api/v1/resources
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "titre": "Cours de Mathématiques - Analyse",
-  "description": "Cours complet sur l'analyse mathématique",
-  "type": "cours",
-  "category_id": 1,
-  "niveau": "Licence 2",
-  "filiere": "Mathématiques",
-  "annee_academique": "2026-2027",
-  "tags": ["analyse", "mathématiques", "intégration"]
-}
-```
-
-#### Mettre à jour une ressource
-```http
-PUT /api/v1/resources/:id
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "titre": "Nouveau titre",
-  "description": "Nouvelle description"
-}
-```
-
-#### Supprimer une ressource
-```http
-DELETE /api/v1/resources/:id
-Authorization: Bearer {token}
-```
-
-#### Télécharger une ressource
-```http
-POST /api/v1/resources/:id/download
-Authorization: Bearer {token}
-```
-
-## 🗄️ Structure de la base de données
-
-### Tables principales
-
-- **users** : Utilisateurs de la plateforme
-- **categories** : Catégories de ressources
-- **resources** : Ressources académiques
-- **favorites** : Favoris des utilisateurs
-- **ratings** : Évaluations des ressources
-- **downloads** : Historique des téléchargements
-- **quiz** : Quiz et exercices
-- **quiz_questions** : Questions de quiz
-- **quiz_attempts** : Tentatives de quiz
-- **notifications** : Notifications utilisateurs
-- **comments** : Commentaires
-
-### Relations
+## 🗂️ Architecture
 
 ```
-users (1) ─────< (N) resources
-users (1) ─────< (N) favorites
-users (1) ─────< (N) ratings
-categories (1) ─< (N) resources
-resources (1) ──< (N) downloads
-resources (1) ──< (N) ratings
-resources (1) ──< (N) favorites
-quiz (1) ───────< (N) quiz_questions
-quiz (1) ───────< (N) quiz_attempts
+Backend/
+├── API.md                    référence de l'API
+├── scripts/
+│   ├── init-db.js            application du schéma SQL
+│   ├── seed.js               compte administrateur
+│   ├── verifier-code.mjs     vérifications statiques
+│   └── generer-postman.mjs   régénère la collection Postman
+├── src/
+│   ├── app.js                application Express (sans écoute réseau)
+│   ├── server.js             démarrage + arrêt gracieux
+│   ├── config/
+│   │   ├── database.js       pool MySQL
+│   │   └── database.sql      schéma complet (v2)
+│   ├── controllers/          auth, users, resources, favorites, catalogue,
+│   │                         notifications, leaderboard, winzone, admin
+│   ├── middlewares/          auth (rôles), validation, erreurs, upload,
+│   │                         normalisation des champs français
+│   ├── routes/               un routeur par domaine + index.js
+│   └── utils/                helpers, ApiError, catégories, gamification,
+│                             notifications
+└── uploads/                  fichiers déposés
 ```
+
+`app.js` est séparé de `server.js` pour permettre de tester l'application
+(routes, validation, sécurité) sans connexion MySQL.
+
+## 📡 Domaines de l'API
+
+| Domaine | Préfixe | Contenu |
+|---|---|---|
+| Authentification | `/api/v1/auth` | inscription, connexion, profil, mot de passe oublié |
+| Utilisateur | `/api/v1/users` | statistiques, activité, préférences |
+| Ressources | `/api/v1/resources` | livres, cours, sujets, corrections, supports |
+| Favoris | `/api/v1/favorites` | liste, ajout, retrait |
+| Catalogue | `/api/v1/categories`, `/api/v1/badges` | matières et badges |
+| Notifications | `/api/v1/notifications` | lecture, marquage |
+| Classement | `/api/v1/leaderboard` | WinRank (matière + période) |
+| WinZone | `/api/v1/winzone` | objectifs, sessions, défis, recommandations |
+| Administration | `/api/v1/admin` | tableau de bord, utilisateurs, modération |
+
+55 routes au total — détail dans [API.md](./API.md).
+
+## 🗄️ Base de données
+
+**19 tables** : `users`, `password_resets`, `categories`, `resources`, `favorites`,
+`ratings`, `downloads`, `comments`, `notifications`, `activities`, `badges`,
+`user_badges`, `study_sessions`, `objectives`, `challenges`, `user_challenges`,
+`quiz`, `quiz_questions`, `quiz_attempts` — plus 2 vues
+(`v_ressources_publiques`, `v_classement`).
+
+Relations principales :
+
+```
+users (1) ─────< (N) resources          categories (1) ─< (N) resources
+users (1) ─────< (N) favorites          resources  (1) ─< (N) downloads
+users (1) ─────< (N) activities         resources  (1) ─< (N) favorites
+users (1) ─────< (N) study_sessions     resources  (1) ─< (N) ratings
+users (1) ─────< (N) objectives         quiz       (1) ─< (N) quiz_questions
+users (1) ─────< (N) user_challenges    quiz       (1) ─< (N) quiz_attempts
+```
+
+Points de gamification (`src/utils/gamification.js`) : inscription +20,
+téléchargement +1, contribution soumise +5, contribution validée +50,
+objectif terminé +25, défi relevé +40, session d'étude +5.
+Les badges sont attribués automatiquement dès que leur condition est remplie.
 
 ## 🔒 Sécurité
 
-- **Helmet** : Protection contre les vulnérabilités web courantes
-- **Rate Limiting** : Limitation du nombre de requêtes par IP
-- **JWT** : Authentification sécurisée par token
-- **bcrypt** : Hashage des mots de passe
-- **CORS** : Configuration des origines autorisées
-- **Validation** : Validation des données avec express-validator
+- **Helmet** : en-têtes HTTP de protection
+- **JWT** : authentification par jeton, rôles `etudiant` / `contributeur` / `admin`
+- **bcrypt** : hachage des mots de passe (10 tours)
+- **Limitation de débit** : 500 requêtes / 15 min, 20 sur les routes
+  d'authentification (force brute, spam d'emails)
+- **Validation** : `express-validator` sur les entrées + identifiants d'URL
+- **Uploads** : extensions autorisées, taille limitée, nom de fichier neutralisé
+- **Requêtes SQL** : requêtes préparées uniquement, `ORDER BY` en liste blanche
+- **Modération** : un dépôt utilisateur n'est publié qu'après validation admin
 
 ## 🎯 Fonctionnalités
 
-✅ Authentification JWT  
-✅ Gestion des utilisateurs  
-✅ CRUD complet des ressources  
-✅ Système de favoris  
-✅ Système d'évaluation (ratings)  
-✅ Historique des téléchargements  
-✅ Recherche et filtrage avancés  
-✅ Pagination  
-✅ Gamification (points)  
-✅ Système de quiz (WinZone)  
-✅ Notifications  
-✅ Commentaires  
+✅ Authentification JWT + rôles
+✅ Inscription, connexion, mot de passe oublié/réinitialisation
+✅ Profil complet (statistiques, activité, préférences, badges)
+✅ CRUD ressources + upload de fichiers + compteur de téléchargements
+✅ Modération (validation / refus motivé) et notifications à l'auteur
+✅ Favoris
+✅ Recherche et filtres avancés + pagination
+✅ Catalogue des matières et des badges
+✅ Classement WinRank (par matière et par période)
+✅ WinZone : objectifs, sessions d'étude, défis, recommandations
+✅ Tableau de bord et gestion des utilisateurs pour l'administration
+✅ Gamification (points, badges, fil d'activité)
 
 ## 📊 Performance
 
-- **Connexion pooling** : Pool de connexions MySQL optimisé
-- **Compression** : Compression gzip des réponses
-- **Indexation** : Index sur les champs critiques
-- **Vues matérialisées** : Pour les statistiques
-- **Cache** : Ready pour Redis (à implémenter)
+- Pool de connexions MySQL (`connectionLimit: 10`)
+- Index sur les colonnes filtrées et triées, index FULLTEXT sur les ressources
+- Compression gzip des réponses
+- Vues SQL pour les listes fréquentes
 
-## 🧪 Tests
+## 🔄 Workflows
 
-```bash
-npm test
-```
+### Ajouter un endpoint
 
-## 📝 Logs
+1. Contrôleur dans `src/controllers/` (utiliser `asyncHandler` + `ApiError`)
+2. Route dans `src/routes/` (règles `express-validator` + `validate`)
+3. Si nouveau domaine : le monter dans `src/routes/index.js`
+4. `npm run verify` puis tester avec Postman
 
-Les logs sont affichés dans la console avec Morgan :
-- Mode développement : Format `dev`
-- Mode production : Format `combined`
+### Ajouter une table
 
-## 🔄 Workflows recommandés
-
-### 1. Créer un nouvel endpoint
-
-1. Créer le contrôleur dans `src/controllers/`
-2. Créer la route dans `src/routes/`
-3. Ajouter la route au serveur dans `src/server.js`
-4. Tester avec Postman/Thunder Client
-
-### 2. Ajouter une nouvelle table
-
-1. Modifier `src/config/database.sql`
-2. Exécuter le script SQL
-3. Créer le modèle/contrôleur correspondant
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+1. Modifier `src/config/database.sql` (idempotent : `CREATE TABLE IF NOT EXISTS`)
+2. `npm run db:init`
+3. `npm run verify` — le script signale toute table ou colonne citée mais absente
 
 ## 📄 Licence
 
@@ -298,12 +215,10 @@ ISC
 ## 👤 Auteur
 
 **YAMBOGO BRICE**
-- Email: yambogobrice@gmail.com
-- LinkedIn: [YAMBOGO BRICE](https://www.linkedin.com/in/yambogo-brice/)
-- GitHub: [@yambogobrice-design](https://github.com/yambogobrice-design)
+- Email : yambogobrice@gmail.com
+- LinkedIn : [YAMBOGO BRICE](https://www.linkedin.com/in/yambogo-brice/)
+- GitHub : [@yambogobrice-design](https://github.com/yambogobrice-design)
 
 ---
 
-**Version:** 1.0.0  
-**Date:** Septembre 2026  
-**Plateforme:** WinBox Academic Platform
+**Version :** 2.0.0

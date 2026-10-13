@@ -10,7 +10,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
     window.scrollTo({ top: 0, behavior: 'instant' });
     
     // Force reflow for better performance
-    document.body.offsetHeight;
+    void document.body.offsetHeight;
   }, [pathname]);
 
   return <>{children}</>;

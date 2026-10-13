@@ -12,14 +12,8 @@ const nextConfig: NextConfig = {
   // Compression
   compress: true,
   
-  // Optimisation du build
-  swcMinify: true,
-  
   // Performance
   reactStrictMode: true,
-  
-  // Optimisation des polices
-  optimizeFonts: true,
   
   // Désactiver le source map en production
   productionBrowserSourceMaps: false,

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import AuthGuard from "@/Components/AuthGuard";
 
 export default function ContribuerPage() {
   const [typeRessource, setTypeRessource] = useState("livre");
@@ -20,7 +21,8 @@ export default function ContribuerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <AuthGuard message="Vous devez être connecté pour contribuer et partager vos ressources avec la communauté.">
+      <div className="min-h-screen bg-white text-black">
       {/* Header */}
       <div className="border-b border-black/10 bg-gradient-to-br from-black/5 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -324,6 +326,7 @@ export default function ContribuerPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }

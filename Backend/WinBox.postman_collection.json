@@ -1,25 +1,28 @@
 {
   "info": {
     "name": "WinBox API",
-    "description": "Collection Postman pour l'API WinBox",
+    "description": "Collection générée depuis l'inventaire des routes (npm run postman).",
+    "version": "2.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
-      "key": "base_url",
-      "value": "http://localhost:5000/api/v1"
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
     },
     {
       "key": "token",
-      "value": ""
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "auth",
       "item": [
         {
-          "name": "Register",
+          "name": "POST /auth/register",
           "request": {
             "method": "POST",
             "header": [
@@ -28,32 +31,26 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Accès public",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password@123\",\n  \"telephone\": \"+226 70591159\",\n  \"niveau\": \"Licence 2\",\n  \"filiere\": \"Informatique\",\n  \"institution\": \"Université de Ouagadougou\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "register"]
+              "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"email\": \"john.doe@example.com\",\n  \"motDePasse\": \"motdepasse123\",\n  \"telephone\": \"+226 70000000\",\n  \"niveau\": \"Licence 2\",\n  \"filiere\": \"Informatique\",\n  \"institution\": \"Université de Ouagadougou\"\n}"
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "const response = pm.response.json();",
-                  "if (response.success && response.data.token) {",
-                  "    pm.collectionVariables.set('token', response.data.token);",
-                  "}"
-                ]
-              }
-            }
-          ],
+          "name": "POST /auth/login",
           "request": {
             "method": "POST",
             "header": [
@@ -62,194 +59,1873 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Accès public",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password@123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "login"]
+              "raw": "{\n  \"email\": \"admin@winbox.com\",\n  \"motDePasse\": \"Admin@123\"\n}"
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Profile",
+          "name": "POST /auth/forgot-password",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/me",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "me"]
-            }
-          }
-        },
-        {
-          "name": "Update Profile",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Accès public",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"Updated Name\",\n  \"prenom\": \"Updated Prenom\",\n  \"telephone\": \"+226 70591159\",\n  \"niveau\": \"Licence 3\",\n  \"filiere\": \"Informatique\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/profile",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "profile"]
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Resources",
-      "item": [
+          },
+          "response": []
+        },
         {
-          "name": "Get All Resources",
+          "name": "POST /auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Accès public",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"jeton-recu-par-email\",\n  \"motDePasse\": \"nouveauMotDePasse123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /auth/me",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/resources?page=1&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["resources"],
-              "query": [
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Get Resource By ID",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/resources/1",
-              "host": ["{{base_url}}"],
-              "path": ["resources", "1"]
-            }
-          }
-        },
-        {
-          "name": "Create Resource",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"titre\": \"Cours de Mathématiques - Analyse\",\n  \"description\": \"Cours complet sur l'analyse mathématique\",\n  \"type\": \"cours\",\n  \"category_id\": 1,\n  \"niveau\": \"Licence 2\",\n  \"filiere\": \"Mathématiques\",\n  \"annee_academique\": \"2026-2027\",\n  \"tags\": [\"analyse\", \"mathématiques\", \"intégration\"]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/resources",
-              "host": ["{{base_url}}"],
-              "path": ["resources"]
-            }
-          }
-        },
-        {
-          "name": "Update Resource",
+          "name": "PUT /auth/profile",
           "request": {
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Doe\",\n  \"prenom\": \"John\",\n  \"niveau\": \"Licence 3\",\n  \"specialite\": \"Génie logiciel\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /auth/profile",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /auth/change-password",
+          "request": {
+            "method": "PUT",
+            "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"titre\": \"Cours mis à jour\",\n  \"description\": \"Description mise à jour\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/resources/1",
-              "host": ["{{base_url}}"],
-              "path": ["resources", "1"]
+              "raw": "{\n  \"ancienMotDePasse\": \"motdepasse123\",\n  \"nouveauMotDePasse\": \"motdepasse456\"\n}"
             }
-          }
+          },
+          "response": []
         },
         {
-          "name": "Delete Resource",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/resources/1",
-              "host": ["{{base_url}}"],
-              "path": ["resources", "1"]
-            }
-          }
-        },
-        {
-          "name": "Download Resource",
+          "name": "POST /auth/logout",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/resources/1/download",
-              "host": ["{{base_url}}"],
-              "path": ["resources", "1", "download"]
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "http://localhost:5000/health",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
-          "path": ["health"]
+      "name": "users",
+      "item": [
+        {
+          "name": "GET /users/me/stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "stats"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/me/activities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "activities"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /users/me/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "preferences"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferences\": {\n    \"notifications_email\": true,\n    \"profil_public\": true,\n    \"participer_classement\": true\n  }\n}"
+            }
+          },
+          "response": []
         }
-      }
+      ]
+    },
+    {
+      "name": "resources",
+      "item": [
+        {
+          "name": "GET /resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /resources/mine",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                "mine"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /resources/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /resources",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            },
+            "description": "multipart/form-data : champ « fichier » + champs texte",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Cours de Mathématiques - Analyse\",\n  \"type\": \"cours\",\n  \"description\": \"Cours complet sur l'analyse mathématique\",\n  \"auteur\": \"Prof. Dupont\",\n  \"matiere\": \"mathematiques\",\n  \"niveau\": \"Licence 2\",\n  \"filiere\": \"Informatique\",\n  \"annee_academique\": \"2026-2027\",\n  \"tags\": [\n    \"analyse\",\n    \"intégration\"\n  ]\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /resources/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Titre corrigé\",\n  \"description\": \"Description mise à jour\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /resources/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /resources/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /resources/:id/download",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}/download",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant",
+                "download"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /resources/:id/file",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}/file",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant",
+                "file"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /resources/:id/favorite",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resources/{{id}}/favorite",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "resources",
+                ":identifiant",
+                "favorite"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "favorites",
+      "item": [
+        {
+          "name": "GET /favorites",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource_id\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /favorites/:id",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /favorites",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /favorites/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "favorites",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "notifications",
+      "item": [
+        {
+          "name": "GET /notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /notifications/read-all",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /notifications/:id/read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{id}}/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                ":identifiant",
+                "read"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /notifications/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "leaderboard",
+      "item": [
+        {
+          "name": "GET /leaderboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /leaderboard/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "me"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "winzone",
+      "item": [
+        {
+          "name": "GET /winzone/overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/overview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "overview"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /winzone/objectives",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/objectives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "objectives"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /winzone/objectives",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/objectives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "objectives"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titre\": \"Maîtriser les intégrales\",\n  \"matiere\": \"mathematiques\",\n  \"dateDebut\": \"2026-10-01\",\n  \"dateEcheance\": \"2026-10-31\",\n  \"objectifHeures\": 12\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /winzone/objectives/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/objectives/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "objectives",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progression\": 50\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /winzone/objectives/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/objectives/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "objectives",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /winzone/subjects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/subjects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "subjects"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /winzone/recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/recommendations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "recommendations"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /winzone/challenges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/challenges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "challenges"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /winzone/challenges/:id/join",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/challenges/{{id}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "challenges",
+                ":identifiant",
+                "join"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /winzone/challenges/:id/progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/challenges/{{id}}/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "challenges",
+                ":identifiant",
+                "progress"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progression\": 3\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /winzone/sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "sessions"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /winzone/sessions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "sessions"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matiere\": \"mathematiques\",\n  \"dureeMinutes\": 90,\n  \"note\": \"Révision du chapitre 3\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /winzone/sessions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/winzone/sessions/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "winzone",
+                "sessions",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "categories",
+      "item": [
+        {
+          "name": "GET /categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /categories/:slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{slug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                ":matiere-slug"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /categories/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories",
+                "me"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "badges",
+      "item": [
+        {
+          "name": "GET /badges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "badges"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /badges/:slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/badges/{{slug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "badges",
+                ":matiere-slug"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /badges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "badges"
+              ]
+            },
+            "description": "Accès public"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /badges/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/badges/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "badges",
+                "me"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "GET /admin/stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "stats"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/activity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/activity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "activity"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/pending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "pending"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/users/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /admin/users/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"contributeur\",\n  \"status\": \"actif\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /admin/users/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                ":identifiant"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "resources"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /admin/resources/:id/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/resources/{{id}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "resources",
+                ":identifiant",
+                "status"
+              ]
+            },
+            "description": "Jeton requis (Bearer)",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"validee\",\n  \"comment\": \"Contenu conforme\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

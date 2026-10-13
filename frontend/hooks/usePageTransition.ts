@@ -13,7 +13,7 @@ export function usePageTransition() {
       window.scrollTo({ top: 0, behavior: 'instant' });
       
       // Force le navigateur à recalculer le layout pour de meilleures performances
-      document.body.offsetHeight;
+      void document.body.offsetHeight;
       
       // Optionnel : Annoncer le changement de page pour l'accessibilité
       const announcement = document.createElement('div');

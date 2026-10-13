@@ -1,95 +1,100 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../config/database.js';
+import ApiError from '../utils/ApiError.js';
 
-// Middleware d'authentification
+/**
+ * Rôles de la plateforme, alignés sur le frontend :
+ *   etudiant | contributeur | admin
+ * Les comptes `suspendu` ou `inactif` ne peuvent pas s'authentifier.
+ */
+
+// Récupère l'utilisateur porteur du token (ou null)
+const chargerUtilisateur = async (token) => {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  const rows = await query(
+    `SELECT id, nom, prenom, email, role, status, niveau, filiere, points
+     FROM users
+     WHERE id = ? AND status = 'actif'`,
+    [decoded.userId]
+  );
+
+  return rows.length > 0 ? rows[0] : null;
+};
+
+// Extrait le token du header Authorization: Bearer <token>
+const extraireToken = (req) => {
+  const header = req.headers.authorization || '';
+  const [schema, token] = header.split(' ');
+  return schema === 'Bearer' && token ? token : null;
+};
+
+// Traduit les erreurs JWT en ApiError
+const erreurJwt = (error) => {
+  if (error.name === 'TokenExpiredError') return ApiError.unauthorized('Token expiré');
+  if (error.name === 'JsonWebTokenError') return ApiError.unauthorized('Token invalide');
+  return error;
+};
+
+// ============================================
+// AUTHENTIFICATION OBLIGATOIRE
+// ============================================
 export const authenticate = async (req, res, next) => {
   try {
-    // Récupérer le token du header
-    const token = req.headers.authorization?.split(' ')[1];
-    
+    const token = extraireToken(req);
+
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Token d\'authentification manquant'
-      });
+      throw ApiError.unauthorized('Token d\'authentification manquant');
     }
 
-    // Vérifier le token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Récupérer l'utilisateur
-    const sql = 'SELECT id, nom, prenom, email, role, is_active FROM users WHERE id = ? AND is_active = TRUE';
-    const users = await query(sql, [decoded.userId]);
-    
-    if (users.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Utilisateur non trouvé ou inactif'
-      });
+    const utilisateur = await chargerUtilisateur(token);
+
+    if (!utilisateur) {
+      throw ApiError.unauthorized('Utilisateur non trouvé ou compte inactif');
     }
 
-    // Attacher l'utilisateur à la requête
-    req.user = users[0];
-    next();
+    req.user = utilisateur;
+    return next();
   } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token invalide'
-      });
-    }
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token expiré'
-      });
-    }
-    return res.status(500).json({
-      success: false,
-      message: 'Erreur d\'authentification',
-      error: error.message
-    });
+    return next(erreurJwt(error));
   }
 };
 
-// Middleware pour vérifier les rôles
-export const authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Non authentifié'
-      });
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Accès refusé. Permissions insuffisantes.'
-      });
-    }
-
-    next();
-  };
-};
-
-// Middleware optionnel (ne bloque pas si pas de token)
+// ============================================
+// AUTHENTIFICATION OPTIONNELLE
+// ============================================
 export const optionalAuth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    
+    const token = extraireToken(req);
+
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const sql = 'SELECT id, nom, prenom, email, role FROM users WHERE id = ? AND is_active = TRUE';
-      const users = await query(sql, [decoded.userId]);
-      
-      if (users.length > 0) {
-        req.user = users[0];
-      }
+      const utilisateur = await chargerUtilisateur(token);
+      if (utilisateur) req.user = utilisateur;
     }
-    next();
-  } catch (error) {
-    // En cas d'erreur, on continue sans utilisateur
-    next();
+  } catch {
+    // Token absent/invalide : on continue en visiteur anonyme
   }
+
+  return next();
 };
+
+// ============================================
+// AUTORISATION PAR RÔLE
+// ============================================
+export const authorize = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return next(ApiError.unauthorized('Non authentifié'));
+  }
+
+  if (!roles.includes(req.user.role)) {
+    return next(ApiError.forbidden('Accès refusé. Permissions insuffisantes.'));
+  }
+
+  return next();
+};
+
+// Raccourcis lisibles dans les routes
+export const estAdmin = authorize('admin');
+export const estContributeur = authorize('contributeur', 'admin');
+
+export default { authenticate, optionalAuth, authorize, estAdmin, estContributeur };

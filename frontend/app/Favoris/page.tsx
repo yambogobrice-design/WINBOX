@@ -1,58 +1,34 @@
 "use client";
 import { useState } from "react";
+import AuthGuard from "@/Components/AuthGuard";
 
-// Données de démonstration
-const favoris = [
-  {
-    id: 1,
-    type: "Livre",
-    titre: "Mathématiques - Algèbre Linéaire",
-    auteur: "Jean Dupont",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    dateAjout: "Il y a 2 jours",
-  },
-  {
-    id: 2,
-    type: "Cours",
-    titre: "Notes de cours - Analyse Mathématique",
-    auteur: "Prof. Dupont",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    dateAjout: "Il y a 3 jours",
-  },
-  {
-    id: 3,
-    type: "Sujet",
-    titre: "Examen Final - Analyse Mathématique",
-    auteur: "Université",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    dateAjout: "Il y a 5 jours",
-  },
-  {
-    id: 4,
-    type: "Correction",
-    titre: "Correction - Analyse Mathématique 2023",
-    auteur: "Prof. Dupont",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    dateAjout: "Il y a 1 semaine",
-  },
-  {
-    id: 5,
-    type: "Livre",
-    titre: "Physique Quantique - Introduction",
-    auteur: "Marie Martin",
-    matiere: "Physique",
-    niveau: "Licence 3",
-    dateAjout: "Il y a 1 semaine",
-  },
-];
+interface Favori {
+  id: number;
+  type: string;
+  titre: string;
+  auteur: string;
+  matiere: string;
+  niveau: string;
+  dateAjout: string;
+}
+
+/**
+ * Favoris de l'utilisateur : vide par défaut, à alimenter par l'API
+ * (ex. GET /api/favorites). Plus aucune donnée de démonstration.
+ */
+const favoris: Favori[] = [];
 
 const types = ["Tous", "Livre", "Cours", "Sujet", "Correction"];
 
 export default function FavorisPage() {
+  return (
+    <AuthGuard message="Vous devez être connecté pour accéder à vos favoris.">
+      <ContenuFavoris />
+    </AuthGuard>
+  );
+}
+
+function ContenuFavoris() {
   const [typeFiltre, setTypeFiltre] = useState("Tous");
   const [recherche, setRecherche] = useState("");
 
@@ -163,22 +139,6 @@ export default function FavorisPage() {
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Statistiques */}
-      <div className="border-b border-black/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <p className="text-black/60">
-              {favorisFiltres.length} élément{favorisFiltres.length > 1 ? "s" : ""} dans vos favoris
-            </p>
-            {favorisFiltres.length > 0 && (
-              <button className="text-sm text-red-600 hover:text-red-700 font-medium">
-                Tout supprimer
-              </button>
-            )}
           </div>
         </div>
       </div>

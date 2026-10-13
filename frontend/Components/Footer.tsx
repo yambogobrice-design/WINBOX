@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="bg-white text-black border-t-2 border-black">
+    <footer className="bg-white text-black">
       {/* Section principale */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -16,7 +16,7 @@ const Footer = () => {
                 alt="WinBox Logo"
                 width={40}
                 height={40}
-                className="rounded-md border-2 border-black"
+                className="rounded-md"
               />
               <h6 className="font-bold text-xl tracking-tight">WINBOX</h6>
             </div>

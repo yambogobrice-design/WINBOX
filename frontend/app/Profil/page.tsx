@@ -1,35 +1,71 @@
 "use client";
 import { useState } from "react";
+import AuthGuard from "@/Components/AuthGuard";
+
+interface ProfilUtilisateur {
+  nom: string;
+  email: string;
+  niveau: string;
+  specialite: string;
+  dateInscription: string;
+  points: number;
+  rang: number;
+  quizCompletes: number;
+  tauxReussite: number;
+}
+
+interface Activite {
+  id: number;
+  type: string;
+  titre: string;
+  date: string;
+  points: string | null;
+}
+
+interface Badge {
+  id: number;
+  nom: string;
+  description: string;
+  obtenu: boolean;
+}
 
 export default function ProfilPage() {
+  return (
+    <AuthGuard message="Vous devez être connecté pour accéder à votre espace personnel.">
+      <ContenuProfil />
+    </AuthGuard>
+  );
+}
+
+function ContenuProfil() {
   const [ongletActif, setOngletActif] = useState("apercu");
 
-  // Données utilisateur
-  const utilisateur = {
-    nom: "Jean Dupont",
-    email: "jean.dupont@email.com",
-    niveau: "Licence 2",
-    specialite: "Informatique",
-    dateInscription: "Janvier 2024",
-    points: 5420,
-    rang: 42,
-    quizCompletes: 42,
-    tauxReussite: 82,
+  // Données du profil : vides par défaut, à alimenter par l'API
+  // (ex. GET /api/users/me). Plus aucune donnée de démonstration.
+  const utilisateur: ProfilUtilisateur = {
+    nom: "",
+    email: "",
+    niveau: "",
+    specialite: "",
+    dateInscription: "",
+    points: 0,
+    rang: 0,
+    quizCompletes: 0,
+    tauxReussite: 0,
   };
 
-  const activitesRecentes = [
-    { id: 1, type: "Quiz complété", titre: "Algorithmes de tri", date: "Il y a 2 heures", points: "+50" },
-    { id: 2, type: "Téléchargement", titre: "Cours - Analyse Mathématique", date: "Il y a 5 heures", points: null },
-    { id: 3, type: "Contribution", titre: "Notes de cours Python", date: "Hier", points: "+100" },
-    { id: 4, type: "Quiz complété", titre: "Mécanique Quantique", date: "Il y a 2 jours", points: "+75" },
-  ];
+  const activitesRecentes: Activite[] = [];
+  const badges: Badge[] = [];
 
-  const badges = [
-    { id: 1, nom: "Premier pas", description: "Premier quiz complété", obtenu: true },
-    { id: 2, nom: "Contributeur", description: "Première contribution", obtenu: true },
-    { id: 3, nom: "Expert", description: "50 quiz complétés", obtenu: false },
-    { id: 4, nom: "Perfectionniste", description: "95% de réussite", obtenu: true },
-  ];
+  // Initiales de l'avatar (aucune tant que le nom n'est pas renseigné)
+  const initiales = utilisateur.nom
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((mot) => mot[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -39,22 +75,46 @@ export default function ProfilPage() {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Avatar */}
             <div className="w-24 h-24 bg-black/10 rounded-full flex items-center justify-center text-4xl font-bold">
-              JD
+              {initiales ? (
+                initiales
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-12 w-12 text-black/40"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              )}
             </div>
 
             {/* Infos */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{utilisateur.nom}</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                {utilisateur.nom || "Profil utilisateur"}
+              </h1>
               <p className="text-black/60 mb-4">
-                {utilisateur.niveau} - {utilisateur.specialite}
+                {[utilisateur.niveau, utilisateur.specialite].filter(Boolean).join(" - ") ||
+                  "Niveau et spécialité non renseignés"}
               </p>
               <div className="flex flex-wrap gap-4 text-sm">
-                <span className="px-3 py-1 bg-black/5 rounded-md">
-                  Membre depuis {utilisateur.dateInscription}
-                </span>
-                <span className="px-3 py-1 bg-black/5 rounded-md">
-                  #{utilisateur.rang} au classement
-                </span>
+                {utilisateur.dateInscription && (
+                  <span className="px-3 py-1 bg-black/5 rounded-md">
+                    Membre depuis {utilisateur.dateInscription}
+                  </span>
+                )}
+                {utilisateur.rang > 0 && (
+                  <span className="px-3 py-1 bg-black/5 rounded-md">
+                    #{utilisateur.rang} au classement
+                  </span>
+                )}
               </div>
             </div>
 
@@ -126,7 +186,9 @@ export default function ProfilPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-black/60">Classement global</span>
-                  <span className="font-semibold">#{utilisateur.rang}</span>
+                  <span className="font-semibold">
+                    {utilisateur.rang > 0 ? `#${utilisateur.rang}` : "Non classé"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -134,6 +196,9 @@ export default function ProfilPage() {
             {/* Activité récente */}
             <div className="border border-black/10 rounded-lg p-6">
               <h2 className="text-xl font-bold mb-6">Activité récente</h2>
+              {activitesRecentes.length === 0 && (
+                <p className="text-sm text-black/60">Aucune activité pour le moment.</p>
+              )}
               <div className="space-y-4">
                 {activitesRecentes.slice(0, 4).map((activite) => (
                   <div key={activite.id} className="flex items-start gap-3 pb-4 border-b border-black/10 last:border-0 last:pb-0">
@@ -170,6 +235,9 @@ export default function ProfilPage() {
         {/* Onglet Activité */}
         {ongletActif === "activite" && (
           <div className="space-y-4">
+            {activitesRecentes.length === 0 && (
+              <p className="text-sm text-black/60">Aucune activité pour le moment.</p>
+            )}
             {activitesRecentes.map((activite) => (
               <div
                 key={activite.id}
@@ -213,6 +281,9 @@ export default function ProfilPage() {
         {/* Onglet Badges */}
         {ongletActif === "badges" && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {badges.length === 0 && (
+              <p className="text-sm text-black/60">Aucun badge pour le moment.</p>
+            )}
             {badges.map((badge) => (
               <div
                 key={badge.id}
@@ -270,9 +341,10 @@ export default function ProfilPage() {
                   <div>
                     <label className="block text-sm font-medium mb-2">Niveau</label>
                     <select 
-                      defaultValue="Licence 2"
+                      defaultValue={utilisateur.niveau}
                       className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
                     >
+                      <option value="">Non renseigné</option>
                       <option>Licence 1</option>
                       <option>Licence 2</option>
                       <option>Licence 3</option>

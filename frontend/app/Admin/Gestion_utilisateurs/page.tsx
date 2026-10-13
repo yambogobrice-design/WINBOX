@@ -15,10 +15,13 @@ interface User {
   telechargements: number;
 }
 
+type FiltreRole = "tous" | User["role"];
+type FiltreStatut = "tous" | User["statut"];
+
 export default function GestionUtilisateurs() {
   const [recherche, setRecherche] = useState("");
-  const [filtreRole, setFiltreRole] = useState<"tous" | "etudiant" | "contributeur" | "admin">("tous");
-  const [filtreStatut, setFiltreStatut] = useState<"tous" | "actif" | "inactif" | "suspendu">("tous");
+  const [filtreRole, setFiltreRole] = useState<FiltreRole>("tous");
+  const [filtreStatut, setFiltreStatut] = useState<FiltreStatut>("tous");
   const [modalOuvert, setModalOuvert] = useState(false);
   const [utilisateurSelectionne, setUtilisateurSelectionne] = useState<User | null>(null);
 
@@ -203,7 +206,7 @@ export default function GestionUtilisateurs() {
 
           <select
             value={filtreRole}
-            onChange={(e) => setFiltreRole(e.target.value as any)}
+            onChange={(e) => setFiltreRole(e.target.value as FiltreRole)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           >
             <option value="tous">Tous les rôles</option>
@@ -214,7 +217,7 @@ export default function GestionUtilisateurs() {
 
           <select
             value={filtreStatut}
-            onChange={(e) => setFiltreStatut(e.target.value as any)}
+            onChange={(e) => setFiltreStatut(e.target.value as FiltreStatut)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
           >
             <option value="tous">Tous les statuts</option>

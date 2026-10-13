@@ -2,12 +2,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import AuthGuard from "@/Components/AuthGuard";
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  return (
+    <AuthGuard message="Vous devez être connecté pour accéder à l'espace d'administration.">
+      <EspaceAdmin>{children}</EspaceAdmin>
+    </AuthGuard>
+  );
+}
+
+function EspaceAdmin({ children }: AdminLayoutProps) {
   const pathname = usePathname();
 
   const menuItems = [

@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import PageTransition from "@/Components/PageTransition";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,13 +61,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body className="min-h-full flex flex-col">
-        <NavBar />
-        <PageTransition>
-          <main className="flex-1">
-            {children}
-          </main>
-        </PageTransition>
-        <Footer />
+        {/* État d'authentification partagé par toute l'application */}
+        <AuthProvider>
+          <NavBar />
+          <PageTransition>
+            <main className="flex-1">
+              {children}
+            </main>
+          </PageTransition>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
