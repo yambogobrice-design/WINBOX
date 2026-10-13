@@ -1,5 +1,6 @@
 import multer from 'multer';
 import ApiError from '../utils/ApiError.js';
+import { supprimerFichier } from './upload.js';
 
 /**
  * Gestion centralisée des erreurs.
@@ -7,6 +8,12 @@ import ApiError from '../utils/ApiError.js';
  */
 export const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
   const estDeveloppement = process.env.NODE_ENV !== 'production';
+
+  // Un fichier a pu être écrit sur le disque avant que la requête échoue
+  // (validation, erreur métier) : on ne laisse pas de fichier orphelin.
+  if (req.file?.filename) {
+    supprimerFichier(req.file.filename);
+  }
 
   // --- Erreurs applicatives (ApiError) ---
   if (err instanceof ApiError) {

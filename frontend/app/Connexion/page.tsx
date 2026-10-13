@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { messageEmail } from "@/lib/validation";
 
 /** Page de destination : chemin interne uniquement, pour éviter une redirection ouverte. */
 function cheminInterneSecurise(cible: string | null): string {
@@ -23,6 +24,7 @@ function FormulaireConnexion() {
   const [seSouvenir, setSeSouvenir] = useState(false);
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState("");
+  const [erreurEmail, setErreurEmail] = useState("");
 
   // Page demandée avant la connexion (chemin interne), /Contribuer par défaut
   const destination = cheminInterneSecurise(searchParams.get("redirect"));
@@ -37,15 +39,34 @@ function FormulaireConnexion() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErreur("");
+    setErreurEmail("");
+
+    // 1) Contrôle du format de l'email avant tout appel au serveur
+    const problemeEmail = messageEmail(email);
+    if (problemeEmail) {
+      setErreurEmail(problemeEmail);
+      return;
+    }
+
+    if (!motDePasse) {
+      setErreur("Le mot de passe est requis");
+      return;
+    }
+
     setChargement(true);
 
     try {
+      // 2) Vérification des identifiants dans la base de données
       const resultat = await connexion(email, motDePasse);
-      
+
       if (resultat.success) {
         // Retour à la page demandée, ou à la contribution par défaut
         router.replace(destination);
       } else {
+        // Une erreur visant l'email s'affiche sous le champ concerné
+        const champEmail = resultat.champs?.find((champ) => champ.field === "email");
+        if (champEmail) setErreurEmail(champEmail.message);
+
         setErreur(resultat.error || "Email ou mot de passe incorrect");
       }
     } catch {
@@ -104,12 +125,20 @@ function FormulaireConnexion() {
                   type="email"
                   id="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (erreurEmail) setErreurEmail("");
+                  }}
                   required
+                  autoComplete="email"
+                  aria-invalid={erreurEmail ? true : undefined}
                   placeholder="votre.email@exemple.com"
-                  className="w-full px-4 py-3 border-2 border-black focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all text-black placeholder:text-gray-400"
+                  className={`w-full px-4 py-3 border-2 ${erreurEmail ? "border-red-500" : "border-black"} focus:outline-none focus:border-black focus:ring-4 focus:ring-black/10 transition-all text-black placeholder:text-gray-400`}
                   disabled={chargement}
                 />
+                {erreurEmail && (
+                  <p className="text-red-600 text-xs mt-1 font-medium">{erreurEmail}</p>
+                )}
               </div>
 
               {/* Mot de passe */}

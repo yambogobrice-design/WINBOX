@@ -41,9 +41,21 @@ EXIT;
 ```
 
 ### Importer le schéma de base de données
+
+Le plus simple, une fois les dépendances installées (étape 4) et `.env` renseigné :
+
 ```bash
-mysql -u winbox_user -p winbox_db < src/config/database.sql
+npm run db:init   # crée la base, les 19 tables, les vues et les données de référence
+npm run seed      # crée le compte administrateur (mot de passe haché)
 ```
+
+Sinon, avec le client MySQL :
+
+```bash
+mysql -u winbox_user -p < src/config/database.sql
+```
+
+Le script `database.sql` est idempotent : il peut être rejoué sans erreur.
 
 ## Étape 3 : Configuration de l'environnement
 
@@ -98,9 +110,18 @@ Vous devriez voir :
 {
   "success": true,
   "message": "API WinBox opérationnelle",
-  "version": "1.0.0"
+  "version": "2.0.0"
 }
 ```
+
+### Vérifications statiques (sans base de données)
+
+```bash
+npm run verify
+```
+
+Ce script contrôle la syntaxe, les imports/exports, la cohérence du schéma SQL et
+affiche l'inventaire des routes exposées.
 
 ## Étape 6 : Tester l'authentification
 
@@ -130,11 +151,33 @@ curl -X POST http://localhost:5000/api/v1/auth/login \
 
 ## Étape 7 : Compte Admin
 
-Le compte admin par défaut est :
-- **Email** : `admin@winbox.com`
-- **Mot de passe** : `Admin@123`
+Le compte administrateur est créé par `npm run seed` (le mot de passe est haché
+par bcrypt et n'est jamais stocké en clair) :
 
-⚠️ **IMPORTANT** : Changez immédiatement ce mot de passe en production !
+- **Email** : `admin@winbox.com` (ou `ADMIN_EMAIL`)
+- **Mot de passe** : `Admin@123` (ou `ADMIN_PASSWORD`)
+
+Pour définir un autre mot de passe dès le départ :
+
+```bash
+ADMIN_PASSWORD='MonMotDePasseFort!2026' npm run seed
+```
+
+⚠️ **IMPORTANT** : Changez ce mot de passe en production !
+
+Pour vérifier l'accès administrateur :
+
+```bash
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@winbox.com","password":"Admin@123"}'
+```
+
+Puis, avec le jeton reçu :
+
+```bash
+curl http://localhost:5000/api/v1/admin/stats -H "Authorization: Bearer <token>"
+```
 
 ## 🔧 Dépannage
 

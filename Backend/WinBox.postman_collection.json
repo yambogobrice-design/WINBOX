@@ -1489,106 +1489,12 @@
             "description": "Accès public"
           },
           "response": []
-        },
-        {
-          "name": "GET /categories",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "categories"
-              ]
-            },
-            "description": "Accès public"
-          },
-          "response": []
-        },
-        {
-          "name": "GET /categories/me",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/categories/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "categories",
-                "me"
-              ]
-            },
-            "description": "Jeton requis (Bearer)",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "response": []
         }
       ]
     },
     {
       "name": "badges",
       "item": [
-        {
-          "name": "GET /badges",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/badges",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "badges"
-              ]
-            },
-            "description": "Accès public"
-          },
-          "response": []
-        },
-        {
-          "name": "GET /badges/:slug",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/badges/{{slug}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "badges",
-                ":matiere-slug"
-              ]
-            },
-            "description": "Jeton requis (Bearer)",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
         {
           "name": "GET /badges",
           "request": {

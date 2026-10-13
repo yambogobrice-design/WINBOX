@@ -1,33 +1,46 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthGuard from "@/Components/AuthGuard";
+import { api, jetonActuel } from "@/lib/api";
+import { useAuthContext } from "@/contexts/AuthContext";
 
-interface ProfilUtilisateur {
-  nom: string;
-  email: string;
-  niveau: string;
-  specialite: string;
-  dateInscription: string;
-  points: number;
-  rang: number;
-  quizCompletes: number;
-  tauxReussite: number;
-}
-
-interface Activite {
+interface ActiviteAPI {
   id: number;
   type: string;
   titre: string;
-  date: string;
-  points: string | null;
+  points: number;
+  created_at: string;
+  matiere: string | null;
 }
 
-interface Badge {
+interface BadgeAPI {
   id: number;
   nom: string;
   description: string;
+  icon: string | null;
   obtenu: boolean;
 }
+
+// Libellés lisibles des types d'activité renvoyés par l'API
+const LIBELLES_ACTIVITE: Record<string, string> = {
+  inscription: "Inscription",
+  quiz: "Quiz complété",
+  telechargement: "Téléchargement",
+  contribution: "Contribution",
+  objectif: "Objectif d'étude",
+  defi: "Défi",
+  badge: "Badge obtenu",
+  session: "Session d'étude",
+};
+
+const formaterDate = (valeur?: string | null): string => {
+  if (!valeur) return "";
+
+  const date = new Date(valeur);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+};
 
 export default function ProfilPage() {
   return (
@@ -40,32 +53,106 @@ export default function ProfilPage() {
 function ContenuProfil() {
   const [ongletActif, setOngletActif] = useState("apercu");
 
-  // Données du profil : vides par défaut, à alimenter par l'API
-  // (ex. GET /api/users/me). Plus aucune donnée de démonstration.
-  const utilisateur: ProfilUtilisateur = {
-    nom: "",
-    email: "",
-    niveau: "",
-    specialite: "",
-    dateInscription: "",
-    points: 0,
-    rang: 0,
-    quizCompletes: 0,
-    tauxReussite: 0,
+  // Profil et statistiques de la personne connectée (base de données)
+  const { utilisateur, stats, mettreAJourUtilisateur, mettreAJourPreferences } = useAuthContext();
+
+  const [messageParametres, setMessageParametres] = useState<{ type: "succes" | "erreur"; texte: string } | null>(null);
+  const [enregistrement, setEnregistrement] = useState(false);
+
+  const [activites, setActivites] = useState<ActiviteAPI[]>([]);
+  const [badges, setBadges] = useState<BadgeAPI[]>([]);
+  const [badgesObtenus, setBadgesObtenus] = useState(0);
+  const [badgesTotal, setBadgesTotal] = useState(0);
+
+  // Activité récente et badges : propres à l'utilisateur connecté
+  useEffect(() => {
+    let annule = false;
+
+    const charger = async () => {
+      const jeton = jetonActuel();
+
+      const [reponseActivites, reponseBadges] = await Promise.allSettled([
+        api<{ activities: ActiviteAPI[] }>("/users/me/activities?limit=20", { token: jeton }),
+        api<{ badges: BadgeAPI[]; progression: { obtenus: number; total: number } }>("/badges/me", {
+          token: jeton,
+        }),
+      ]);
+
+      if (annule) return;
+
+      if (reponseActivites.status === "fulfilled") {
+        setActivites(reponseActivites.value.activities ?? []);
+      }
+
+      if (reponseBadges.status === "fulfilled") {
+        setBadges(reponseBadges.value.badges ?? []);
+        setBadgesObtenus(reponseBadges.value.progression?.obtenus ?? 0);
+        setBadgesTotal(reponseBadges.value.progression?.total ?? 0);
+      }
+    };
+
+    void charger();
+
+    return () => {
+      annule = true;
+    };
+  }, []);
+
+  /**
+   * Enregistre les informations personnelles et les préférences en base.
+   * Les champs sont lus dans le formulaire (FormData) : pas d'état intermédiaire
+   * à maintenir quand le profil se charge.
+   */
+  const enregistrerParametres = async (evenement: React.FormEvent<HTMLFormElement>) => {
+    evenement.preventDefault();
+    setMessageParametres(null);
+
+    const donnees = new FormData(evenement.currentTarget);
+    const valeur = (champ: string) => String(donnees.get(champ) ?? "").trim();
+
+    setEnregistrement(true);
+
+    const resultatProfil = await mettreAJourUtilisateur({
+      prenom: valeur("prenom"),
+      nom: valeur("nom"),
+      email: valeur("email"),
+      niveau: valeur("niveau"),
+      specialite: valeur("specialite"),
+    });
+
+    if (!resultatProfil.success) {
+      setEnregistrement(false);
+      setMessageParametres({ type: "erreur", texte: resultatProfil.error });
+      return;
+    }
+
+    const resultatPreferences = await mettreAJourPreferences({
+      notifications_email: donnees.get("notifications_email") === "on",
+      profil_public: donnees.get("profil_public") === "on",
+      participer_classement: donnees.get("participer_classement") === "on",
+    });
+
+    setEnregistrement(false);
+    setMessageParametres(
+      resultatPreferences.success
+        ? { type: "succes", texte: "Modifications enregistrées." }
+        : { type: "erreur", texte: resultatPreferences.error }
+    );
   };
 
-  const activitesRecentes: Activite[] = [];
-  const badges: Badge[] = [];
-
-  // Initiales de l'avatar (aucune tant que le nom n'est pas renseigné)
-  const initiales = utilisateur.nom
-    .trim()
+  const nomComplet = [utilisateur?.prenom, utilisateur?.nom].filter(Boolean).join(" ");
+  const initiales = nomComplet
     .split(/\s+/)
     .filter(Boolean)
     .map((mot) => mot[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
+  const points = utilisateur?.points ?? 0;
+  const rang = stats?.rang ?? 0;
+  const quizCompletes = stats?.quiz_completes ?? 0;
+  const tauxReussite = stats?.taux_reussite ?? 0;
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -98,21 +185,24 @@ function ContenuProfil() {
             {/* Infos */}
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">
-                {utilisateur.nom || "Profil utilisateur"}
+                {nomComplet || "Profil utilisateur"}
               </h1>
+              {utilisateur?.email && (
+                <p className="text-black/70 mb-1">{utilisateur.email}</p>
+              )}
               <p className="text-black/60 mb-4">
-                {[utilisateur.niveau, utilisateur.specialite].filter(Boolean).join(" - ") ||
+                {[utilisateur?.niveau, utilisateur?.specialite].filter(Boolean).join(" - ") ||
                   "Niveau et spécialité non renseignés"}
               </p>
               <div className="flex flex-wrap gap-4 text-sm">
-                {utilisateur.dateInscription && (
+                {utilisateur?.created_at && (
                   <span className="px-3 py-1 bg-black/5 rounded-md">
-                    Membre depuis {utilisateur.dateInscription}
+                    Membre depuis {formaterDate(utilisateur.created_at)}
                   </span>
                 )}
-                {utilisateur.rang > 0 && (
+                {rang > 0 && (
                   <span className="px-3 py-1 bg-black/5 rounded-md">
-                    #{utilisateur.rang} au classement
+                    #{rang} au classement
                   </span>
                 )}
               </div>
@@ -121,15 +211,15 @@ function ContenuProfil() {
             {/* Stats rapides */}
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold">{utilisateur.points}</p>
+                <p className="text-2xl font-bold">{points}</p>
                 <p className="text-xs text-black/60">Points</p>
               </div>
               <div>
-                <p className="text-2xl font-bold">{utilisateur.quizCompletes}</p>
+                <p className="text-2xl font-bold">{quizCompletes}</p>
                 <p className="text-xs text-black/60">Quiz</p>
               </div>
               <div>
-                <p className="text-2xl font-bold">{utilisateur.tauxReussite}%</p>
+                <p className="text-2xl font-bold">{tauxReussite}%</p>
                 <p className="text-xs text-black/60">Réussite</p>
               </div>
             </div>
@@ -173,21 +263,37 @@ function ContenuProfil() {
               <h2 className="text-xl font-bold mb-6">Statistiques</h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-center pb-4 border-b border-black/10">
+                  <span className="text-black/60">Contributions validées</span>
+                  <span className="font-semibold">{stats?.contributions ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-black/10">
+                  <span className="text-black/60">Contributions en attente</span>
+                  <span className="font-semibold">{stats?.contributions_en_attente ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-black/10">
+                  <span className="text-black/60">Téléchargements</span>
+                  <span className="font-semibold">{stats?.telechargements ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-black/10">
+                  <span className="text-black/60">Favoris</span>
+                  <span className="font-semibold">{stats?.favoris ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-black/10">
                   <span className="text-black/60">Quiz complétés</span>
-                  <span className="font-semibold">{utilisateur.quizCompletes}</span>
+                  <span className="font-semibold">{quizCompletes}</span>
                 </div>
                 <div className="flex justify-between items-center pb-4 border-b border-black/10">
                   <span className="text-black/60">Taux de réussite</span>
-                  <span className="font-semibold">{utilisateur.tauxReussite}%</span>
+                  <span className="font-semibold">{tauxReussite}%</span>
                 </div>
                 <div className="flex justify-between items-center pb-4 border-b border-black/10">
                   <span className="text-black/60">Points totaux</span>
-                  <span className="font-semibold">{utilisateur.points}</span>
+                  <span className="font-semibold">{points}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-black/60">Classement global</span>
                   <span className="font-semibold">
-                    {utilisateur.rang > 0 ? `#${utilisateur.rang}` : "Non classé"}
+                    {rang > 0 ? `#${rang}` : "Non classé"}
                   </span>
                 </div>
               </div>
@@ -196,11 +302,11 @@ function ContenuProfil() {
             {/* Activité récente */}
             <div className="border border-black/10 rounded-lg p-6">
               <h2 className="text-xl font-bold mb-6">Activité récente</h2>
-              {activitesRecentes.length === 0 && (
+              {activites.length === 0 && (
                 <p className="text-sm text-black/60">Aucune activité pour le moment.</p>
               )}
               <div className="space-y-4">
-                {activitesRecentes.slice(0, 4).map((activite) => (
+                {activites.slice(0, 4).map((activite) => (
                   <div key={activite.id} className="flex items-start gap-3 pb-4 border-b border-black/10 last:border-0 last:pb-0">
                     <div className="w-10 h-10 bg-black/5 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg
@@ -220,10 +326,14 @@ function ContenuProfil() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">{activite.titre}</p>
-                      <p className="text-xs text-black/60">{activite.type} • {activite.date}</p>
+                      <p className="text-xs text-black/60">
+                        {LIBELLES_ACTIVITE[activite.type] ?? activite.type}
+                        {activite.matiere ? ` • ${activite.matiere}` : ""} •{" "}
+                        {formaterDate(activite.created_at)}
+                      </p>
                     </div>
-                    {activite.points && (
-                      <span className="text-sm font-medium text-green-600">{activite.points}</span>
+                    {activite.points > 0 && (
+                      <span className="text-sm font-medium text-green-600">+{activite.points}</span>
                     )}
                   </div>
                 ))}
@@ -235,10 +345,10 @@ function ContenuProfil() {
         {/* Onglet Activité */}
         {ongletActif === "activite" && (
           <div className="space-y-4">
-            {activitesRecentes.length === 0 && (
+            {activites.length === 0 && (
               <p className="text-sm text-black/60">Aucune activité pour le moment.</p>
             )}
-            {activitesRecentes.map((activite) => (
+            {activites.map((activite) => (
               <div
                 key={activite.id}
                 className="border border-black/10 rounded-lg p-6 hover:border-black/30 transition-all"
@@ -263,14 +373,17 @@ function ContenuProfil() {
                     </div>
                     <div>
                       <p className="font-semibold">{activite.titre}</p>
-                      <p className="text-sm text-black/60">{activite.type}</p>
+                      <p className="text-sm text-black/60">
+                        {LIBELLES_ACTIVITE[activite.type] ?? activite.type}
+                        {activite.matiere ? ` • ${activite.matiere}` : ""}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    {activite.points && (
-                      <p className="font-semibold text-green-600 mb-1">{activite.points}</p>
+                    {activite.points > 0 && (
+                      <p className="font-semibold text-green-600 mb-1">+{activite.points}</p>
                     )}
-                    <p className="text-xs text-black/60">{activite.date}</p>
+                    <p className="text-xs text-black/60">{formaterDate(activite.created_at)}</p>
                   </div>
                 </div>
               </div>
@@ -280,11 +393,16 @@ function ContenuProfil() {
 
         {/* Onglet Badges */}
         {ongletActif === "badges" && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {badges.length === 0 && (
-              <p className="text-sm text-black/60">Aucun badge pour le moment.</p>
-            )}
-            {badges.map((badge) => (
+          <div>
+            <p className="text-sm text-black/60 mb-6">
+              {badgesObtenus} badge{badgesObtenus > 1 ? "s" : ""} obtenu
+              {badgesObtenus > 1 ? "s" : ""} sur {badgesTotal}
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {badges.length === 0 && (
+                <p className="text-sm text-black/60">Aucun badge pour le moment.</p>
+              )}
+              {badges.map((badge) => (
               <div
                 key={badge.id}
                 className={`border rounded-lg p-6 text-center ${
@@ -312,51 +430,99 @@ function ContenuProfil() {
                 )}
               </div>
             ))}
+            </div>
           </div>
         )}
 
         {/* Onglet Paramètres */}
         {ongletActif === "parametres" && (
-          <div className="max-w-2xl space-y-6">
+          <form className="max-w-2xl space-y-6" onSubmit={enregistrerParametres}>
             <div className="border border-black/10 rounded-lg p-6">
               <h2 className="text-xl font-bold mb-6">Informations personnelles</h2>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Nom complet</label>
-                  <input
-                    type="text"
-                    defaultValue={utilisateur.nom}
-                    className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="prenom" className="block text-sm font-medium mb-2">Prénom</label>
+                    <input
+                      type="text"
+                      id="prenom"
+                      name="prenom"
+                      defaultValue={utilisateur?.prenom ?? ""}
+                      className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="nom" className="block text-sm font-medium mb-2">Nom</label>
+                    <input
+                      type="text"
+                      id="nom"
+                      name="nom"
+                      defaultValue={utilisateur?.nom ?? ""}
+                      className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
                   <input
                     type="email"
-                    defaultValue={utilisateur.email}
+                    id="email"
+                    name="email"
+                    defaultValue={utilisateur?.email ?? ""}
                     className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Niveau</label>
+                    <label htmlFor="niveau" className="block text-sm font-medium mb-2">Niveau</label>
                     <select 
-                      defaultValue={utilisateur.niveau}
+                      id="niveau"
+                      name="niveau"
+                      defaultValue={utilisateur?.niveau ?? ""}
                       className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
                     >
                       <option value="">Non renseigné</option>
-                      <option>Licence 1</option>
-                      <option>Licence 2</option>
-                      <option>Licence 3</option>
-                      <option>Master 1</option>
-                      <option>Master 2</option>
+                      <option>BACHELOR ELECTRO.MAINTENANCE ENGINS LOURDS</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S1</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S2</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S3</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S4</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S5</option>
+                      <option>BACHELOR TECHNO EMIH-EREE S6</option>
+                      <option>BACHELOR TECHNO TOPO SIG S6 D</option>
+                      <option>BACHELOR CENTRALE-2iE AFRICAN ANNEE 1</option>
+                      <option>BACHELOR CENTRALE-2iE AFRICAN ANNEE 2</option>
+                      <option>BACHELOR L1 - S1</option>
+                      <option>BACHELOR L1 - S2</option>
+                      <option>BACHELOR L2 - S3</option>
+                      <option>BACHELOR L2 - S4</option>
+                      <option>BACHELOR L3D - S5 D</option>
+                      <option>BACHELOR L3D - S6 D</option>
+                      <option>BACHELOR L3S - S5 S</option>
+                      <option>COURS PREPA 1</option>
+                      <option>COURS PREPA 2</option>
+                      <option>CYCLE ING IIA S5D</option>
+                      <option>CYCLE ING IIA S6</option>
+                      <option>CYCLE ING IIA S7</option>
+                      <option>CYCLE ING IIA S8</option>
+                      <option>CYCLE ING IIA S9</option>
+                      <option>MASTER SP ANC</option>
+                      <option>MASTER SP WASH</option>
+                      <option>MASTER 1 S7</option>
+                      <option>MASTER 1 S8</option>
+                      <option>MASTER 2 S9 GC - BTP</option>
+                      <option>MASTER 2 S9 GEAAH</option>
+                      <option>MASTER 2 S9 GEE</option>
+                      <option>PROGRAMME DE MISE A NIVEAU</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Spécialité</label>
+                    <label htmlFor="specialite" className="block text-sm font-medium mb-2">Spécialité</label>
                     <input
                       type="text"
-                      defaultValue={utilisateur.specialite}
+                      id="specialite"
+                      name="specialite"
+                      defaultValue={utilisateur?.specialite ?? ""}
                       className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
                     />
                   </div>
@@ -369,23 +535,52 @@ function ContenuProfil() {
               <div className="space-y-4">
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm">Recevoir les notifications par email</span>
-                  <input type="checkbox" className="w-5 h-5" />
+                  <input
+                    type="checkbox"
+                    name="notifications_email"
+                    defaultChecked={utilisateur?.preferences?.notifications_email ?? false}
+                    className="w-5 h-5"
+                  />
                 </label>
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm">Afficher mon profil publiquement</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5" />
+                  <input
+                    type="checkbox"
+                    name="profil_public"
+                    defaultChecked={utilisateur?.preferences?.profil_public ?? false}
+                    className="w-5 h-5"
+                  />
                 </label>
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm">Participer au classement</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5" />
+                  <input
+                    type="checkbox"
+                    name="participer_classement"
+                    defaultChecked={utilisateur?.preferences?.participer_classement ?? false}
+                    className="w-5 h-5"
+                  />
                 </label>
               </div>
             </div>
 
-            <button className="w-full px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-black/90 transition-all">
-              Enregistrer les modifications
+            {messageParametres && (
+              <p
+                className={`text-sm font-medium ${
+                  messageParametres.type === "succes" ? "text-green-700" : "text-red-600"
+                }`}
+              >
+                {messageParametres.texte}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={enregistrement}
+              className="w-full px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-black/90 transition-all disabled:opacity-60"
+            >
+              {enregistrement ? "Enregistrement..." : "Enregistrer les modifications"}
             </button>
-          </div>
+          </form>
         )}
       </div>
     </div>

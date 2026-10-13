@@ -1,11 +1,12 @@
 "use client";
 import { createContext, useContext, ReactNode } from "react";
-import { useAuth, type AuthResult, type User } from "@/hooks/useAuth";
+import { useAuth, type AuthResult, type StatsUtilisateur, type User } from "@/hooks/useAuth";
 
-export type { AuthResult, User };
+export type { AuthResult, StatsUtilisateur, User };
 
 interface AuthContextType {
   utilisateur: User | null;
+  stats: StatsUtilisateur | null;
   estConnecte: boolean;
   chargement: boolean;
   connexion: (email: string, motDePasse: string) => Promise<AuthResult>;
@@ -16,8 +17,9 @@ interface AuthContextType {
     motDePasse: string
   ) => Promise<AuthResult>;
   deconnexion: () => void;
-  mettreAJourUtilisateur: (donnees: Partial<User>) => void;
-  verifierAuthentification: () => void;
+  mettreAJourUtilisateur: (donnees: Partial<User>) => Promise<AuthResult>;
+  mettreAJourPreferences: (preferences: Record<string, boolean>) => Promise<AuthResult>;
+  verifierAuthentification: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -12,31 +12,29 @@ sudo apt install mysql-server
 brew install mysql
 ```
 
-### 2️⃣ Créer la base de données
+### 2️⃣ Installer les dépendances et préparer la base
 ```bash
-# Se connecter à MySQL
-mysql -u root -p
+npm install
+cp .env.example .env      # puis renseigner DB_PASSWORD et JWT_SECRET
 
-# Exécuter le script
-source src/config/database.sql
+npm run db:init           # crée la base, les tables, les vues et les données de référence
+npm run seed              # crée le compte administrateur
+```
 
-# Ou en une ligne
+Si vous préférez le client MySQL :
+```bash
 mysql -u root -p < src/config/database.sql
 ```
 
 ### 3️⃣ Configurer l'environnement
 ```bash
-# Copier le fichier d'exemple
-cp .env.example .env
-
 # Éditer .env et changer :
 # - DB_PASSWORD avec votre mot de passe MySQL
 # - JWT_SECRET avec une clé aléatoire
 ```
 
-### 4️⃣ Installer et démarrer
+### 4️⃣ Démarrer
 ```bash
-npm install
 npm run dev
 ```
 
@@ -53,7 +51,12 @@ Vous devriez voir :
 
 ## 🎉 C'est prêt !
 
-### Compte Admin par défaut
+### Vérifier le code sans base de données
+```bash
+npm run verify
+```
+
+### Compte Admin par défaut (créé par `npm run seed`)
 - **Email** : admin@winbox.com
 - **Mot de passe** : Admin@123
 
@@ -65,17 +68,21 @@ curl -X POST http://localhost:5000/api/v1/auth/register \
     "nom": "Test",
     "prenom": "User",
     "email": "test@winbox.com",
-    "password": "Test@123",
+    "motDePasse": "Test@1234",
     "niveau": "Licence 2"
   }'
 ```
 
+### Explorer l'API
+- Collection Postman : `WinBox.postman_collection.json` (régénérable avec `npm run postman`)
+- Référence complète : `API.md`
+
 ## 📚 Prochaines Étapes
 
-1. Lire `README.md` pour la documentation complète
-2. Lire `SETUP.md` pour la configuration détaillée
-3. Tester les endpoints avec Postman
-4. Connecter le frontend
+1. Lire `API.md` pour la référence des endpoints
+2. Lire `README.md` pour l'architecture et les scripts
+3. Lire `SETUP.md` pour la configuration détaillée
+4. Connecter le frontend (voir la section « Correspondance avec les pages du frontend » dans `API.md`)
 
 ## 🆘 Problèmes ?
 

@@ -13,9 +13,43 @@ const livres: {
   telechargements: number;
 }[] = [];
 
-const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
+const niveaux = [
+  "Tous",
+  "BACHELOR ELECTRO.MAINTENANCE ENGINS LOURDS",
+  "BACHELOR TECHNO EMIH-EREE S1",
+  "BACHELOR TECHNO EMIH-EREE S2",
+  "BACHELOR TECHNO EMIH-EREE S3",
+  "BACHELOR TECHNO EMIH-EREE S4",
+  "BACHELOR TECHNO EMIH-EREE S5",
+  "BACHELOR TECHNO EMIH-EREE S6",
+  "BACHELOR TECHNO TOPO SIG S6 D",
+  "BACHELOR CENTRALE-2iE AFRICAN ANNEE 1",
+  "BACHELOR CENTRALE-2iE AFRICAN ANNEE 2",
+  "BACHELOR L1 - S1",
+  "BACHELOR L1 - S2",
+  "BACHELOR L2 - S3",
+  "BACHELOR L2 - S4",
+  "BACHELOR L3D - S5 D",
+  "BACHELOR L3D - S6 D",
+  "BACHELOR L3S - S5 S",
+  "COURS PREPA 1",
+  "COURS PREPA 2",
+  "CYCLE ING IIA S5D",
+  "CYCLE ING IIA S6",
+  "CYCLE ING IIA S7",
+  "CYCLE ING IIA S8",
+  "CYCLE ING IIA S9",
+  "MASTER SP ANC",
+  "MASTER SP WASH",
+  "MASTER 1 S7",
+  "MASTER 1 S8",
+  "MASTER 2 S9 GC - BTP",
+  "MASTER 2 S9 GEAAH",
+  "MASTER 2 S9 GEE",
+  "PROGRAMME DE MISE A NIVEAU"
+];
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
-const filieres = ["Toutes", "MPCI", "MPI", "MP", "BCG", "SVI", "MIAS", "MIPC", "Économie et Gestion", "Droit"];
+const filieres = ["Toutes"];
 
 export default function LivresPage() {
   const [recherche, setRecherche] = useState("");
@@ -49,30 +83,17 @@ export default function LivresPage() {
       {/* Filtres et recherche */}
       <div className="border-b border-black/10 bg-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Recherche */}
             <div className="md:col-span-2">
               <input
                 type="text"
-                placeholder="Rechercher un livre..."
+                placeholder="Rechercher un livre par titre ou auteur..."
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
                 className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
               />
             </div>
-
-            {/* Filtre Filière */}
-            <select
-              value={filiereFiltre}
-              onChange={(e) => setFiliereFiltre(e.target.value)}
-              className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
-            >
-              {filieres.map((filiere) => (
-                <option key={filiere} value={filiere}>
-                  {filiere === "Toutes" ? "Toutes les filières" : filiere}
-                </option>
-              ))}
-            </select>
 
             {/* Filtre Niveau */}
             <select

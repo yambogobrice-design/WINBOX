@@ -1,8 +1,13 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ApiError from '../utils/ApiError.js';
+
+// Ce module lit process.env à son chargement : on s'assure que .env est chargé
+// avant, quel que soit l'ordre des imports.
+dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

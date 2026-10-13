@@ -8,7 +8,8 @@ import notificationRoutes from './notificationRoutes.js';
 import leaderboardRoutes from './leaderboardRoutes.js';
 import winzoneRoutes from './winzoneRoutes.js';
 import adminRoutes from './adminRoutes.js';
-import { categoryRoutes, badgeRoutes } from './catalogueRoutes.js';
+import categoryRoutes from './categoryRoutes.js';
+import badgeRoutes from './badgeRoutes.js';
 
 /**
  * Point de montage unique de l'API.

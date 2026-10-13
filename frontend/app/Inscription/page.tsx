@@ -2,8 +2,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { LONGUEUR_MIN_MOT_DE_PASSE, messageEmail } from "@/lib/validation";
+
+// Champs renvoyés par l'API → champs du formulaire
+const CORRESPONDANCE_CHAMPS: Record<string, string> = {
+  password: "motDePasse",
+  telephone: "telephone",
+};
 
 export default function InscriptionPage() {
+  const router = useRouter();
+  const { inscription } = useAuthContext();
   const [formData, setFormData] = useState({
     prenom: "",
     nom: "",
@@ -26,11 +37,15 @@ export default function InscriptionPage() {
     if (formData.nom.length < 2) {
       nouvellesErreurs.nom = "Le nom doit contenir au moins 2 caractères";
     }
-    if (!formData.email.includes("@")) {
-      nouvellesErreurs.email = "Adresse email invalide";
+
+    // Contrôle du format de l'email (le serveur vérifie ensuite qu'il est libre)
+    const problemeEmail = messageEmail(formData.email);
+    if (problemeEmail) {
+      nouvellesErreurs.email = problemeEmail;
     }
-    if (formData.motDePasse.length < 8) {
-      nouvellesErreurs.motDePasse = "Le mot de passe doit contenir au moins 8 caractères";
+
+    if (formData.motDePasse.length < LONGUEUR_MIN_MOT_DE_PASSE) {
+      nouvellesErreurs.motDePasse = `Le mot de passe doit contenir au moins ${LONGUEUR_MIN_MOT_DE_PASSE} caractères`;
     }
     if (formData.motDePasse !== formData.confirmationMotDePasse) {
       nouvellesErreurs.confirmationMotDePasse = "Les mots de passe ne correspondent pas";
@@ -49,15 +64,37 @@ export default function InscriptionPage() {
     if (!validerFormulaire()) return;
 
     setChargement(true);
+    setErreurs({});
 
     try {
-      // TODO: Implémenter la logique d'inscription avec votre backend
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulation
-      
-      // Redirection après inscription réussie
-      // router.push('/Connexion');
-      
-      console.log("Inscription:", formData);
+      // Enregistrement du compte dans la base de données
+      const resultat = await inscription(
+        formData.prenom,
+        formData.nom,
+        formData.email,
+        formData.motDePasse
+      );
+
+      if (resultat.success) {
+        // Le compte est créé et la session ouverte : direction la contribution
+        router.replace("/Contribuer");
+        return;
+      }
+
+      // Erreurs de validation renvoyées par le serveur (email déjà utilisé, etc.)
+      const erreursServeur: Record<string, string> = {};
+      for (const champ of resultat.champs ?? []) {
+        erreursServeur[CORRESPONDANCE_CHAMPS[champ.field] ?? champ.field] = champ.message;
+      }
+
+      if (Object.keys(erreursServeur).length > 0) {
+        setErreurs(erreursServeur);
+      } else if (resultat.statut === 409) {
+        // Email déjà présent en base : l'erreur s'affiche sous le champ email
+        setErreurs({ email: resultat.error });
+      } else {
+        setErreurs({ general: resultat.error });
+      }
     } catch {
       setErreurs({ general: "Une erreur est survenue lors de l'inscription" });
     } finally {

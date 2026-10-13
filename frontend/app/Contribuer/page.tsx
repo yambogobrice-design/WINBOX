@@ -33,26 +33,6 @@ export default function ContribuerPage() {
         </div>
       </div>
 
-      {/* Stats de contribution */}
-      <div className="border-b border-black/10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-3 gap-6 text-center">
-            <div>
-              <p className="text-3xl font-bold mb-1">1,234</p>
-              <p className="text-sm text-black/60">Contributions</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold mb-1">567</p>
-              <p className="text-sm text-black/60">Contributeurs</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold mb-1">50K+</p>
-              <p className="text-sm text-black/60">Téléchargements</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Formulaire */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white border border-black/10 rounded-lg p-8">
@@ -152,11 +132,38 @@ export default function ContribuerPage() {
                   className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
                 >
                   <option value="">Sélectionner un niveau</option>
-                  <option value="licence1">Licence 1</option>
-                  <option value="licence2">Licence 2</option>
-                  <option value="licence3">Licence 3</option>
-                  <option value="master1">Master 1</option>
-                  <option value="master2">Master 2</option>
+                  <option value="bachelor_electro">BACHELOR ELECTRO.MAINTENANCE ENGINS LOURDS</option>
+                  <option value="bachelor_techno_s1">BACHELOR TECHNO EMIH-EREE S1</option>
+                  <option value="bachelor_techno_s2">BACHELOR TECHNO EMIH-EREE S2</option>
+                  <option value="bachelor_techno_s3">BACHELOR TECHNO EMIH-EREE S3</option>
+                  <option value="bachelor_techno_s4">BACHELOR TECHNO EMIH-EREE S4</option>
+                  <option value="bachelor_techno_s5">BACHELOR TECHNO EMIH-EREE S5</option>
+                  <option value="bachelor_techno_s6">BACHELOR TECHNO EMIH-EREE S6</option>
+                  <option value="bachelor_topo">BACHELOR TECHNO TOPO SIG S6 D</option>
+                  <option value="bachelor_centrale_1">BACHELOR CENTRALE-2iE AFRICAN ANNEE 1</option>
+                  <option value="bachelor_centrale_2">BACHELOR CENTRALE-2iE AFRICAN ANNEE 2</option>
+                  <option value="bachelor_l1_s1">BACHELOR L1 - S1</option>
+                  <option value="bachelor_l1_s2">BACHELOR L1 - S2</option>
+                  <option value="bachelor_l2_s3">BACHELOR L2 - S3</option>
+                  <option value="bachelor_l2_s4">BACHELOR L2 - S4</option>
+                  <option value="bachelor_l3d_s5">BACHELOR L3D - S5 D</option>
+                  <option value="bachelor_l3d_s6">BACHELOR L3D - S6 D</option>
+                  <option value="bachelor_l3s_s5">BACHELOR L3S - S5 S</option>
+                  <option value="prepa_1">COURS PREPA 1</option>
+                  <option value="prepa_2">COURS PREPA 2</option>
+                  <option value="ing_s5d">CYCLE ING IIA S5D</option>
+                  <option value="ing_s6">CYCLE ING IIA S6</option>
+                  <option value="ing_s7">CYCLE ING IIA S7</option>
+                  <option value="ing_s8">CYCLE ING IIA S8</option>
+                  <option value="ing_s9">CYCLE ING IIA S9</option>
+                  <option value="master_sp_anc">MASTER SP ANC</option>
+                  <option value="master_sp_wash">MASTER SP WASH</option>
+                  <option value="master1_s7">MASTER 1 S7</option>
+                  <option value="master1_s8">MASTER 1 S8</option>
+                  <option value="master2_gc">MASTER 2 S9 GC - BTP</option>
+                  <option value="master2_geaah">MASTER 2 S9 GEAAH</option>
+                  <option value="master2_gee">MASTER 2 S9 GEE</option>
+                  <option value="pmn">PROGRAMME DE MISE A NIVEAU</option>
                 </select>
               </div>
             </div>

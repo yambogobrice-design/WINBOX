@@ -3,19 +3,53 @@ import { useState } from "react";
 
 // Données de démonstration - tous types de ressources
 const ressources = [
-  { id: 1, type: "Livre", titre: "Mathématiques - Algèbre Linéaire", matiere: "Mathématiques", niveau: "Licence 2", auteur: "Jean Dupont" },
-  { id: 2, type: "Cours", titre: "Notes de cours - Analyse Mathématique", matiere: "Mathématiques", niveau: "Licence 2", auteur: "Prof. Dupont" },
-  { id: 3, type: "Sujet", titre: "Examen Final - Analyse Mathématique", matiere: "Mathématiques", niveau: "Licence 2", auteur: "Université" },
-  { id: 4, type: "Correction", titre: "Correction - Analyse Mathématique 2023", matiere: "Mathématiques", niveau: "Licence 2", auteur: "Prof. Dupont" },
-  { id: 5, type: "Livre", titre: "Physique Quantique - Introduction", matiere: "Physique", niveau: "Licence 3", auteur: "Marie Martin" },
-  { id: 6, type: "Livre", titre: "Programmation Python Avancée", matiere: "Informatique", niveau: "Master 1", auteur: "Ahmed Benali" },
-  { id: 7, type: "Cours", titre: "Fiche de révision - Mécanique quantique", matiere: "Physique", niveau: "Licence 3", auteur: "Prof. Martin" },
-  { id: 8, type: "Sujet", titre: "Partiel - Mécanique Quantique", matiere: "Physique", niveau: "Licence 3", auteur: "Université" },
+  { id: 1, type: "Livre", titre: "Mathématiques - Algèbre Linéaire", matiere: "Mathématiques", niveau: "BACHELOR L2 - S3", auteur: "Jean Dupont" },
+  { id: 2, type: "Cours", titre: "Notes de cours - Analyse Mathématique", matiere: "Mathématiques", niveau: "BACHELOR L2 - S3", auteur: "Prof. Dupont" },
+  { id: 3, type: "Sujet", titre: "Examen Final - Analyse Mathématique", matiere: "Mathématiques", niveau: "BACHELOR L2 - S3", auteur: "Université" },
+  { id: 4, type: "Correction", titre: "Correction - Analyse Mathématique 2023", matiere: "Mathématiques", niveau: "BACHELOR L2 - S3", auteur: "Prof. Dupont" },
+  { id: 5, type: "Livre", titre: "Physique Quantique - Introduction", matiere: "Physique", niveau: "BACHELOR L3D - S5 D", auteur: "Marie Martin" },
+  { id: 6, type: "Livre", titre: "Programmation Python Avancée", matiere: "Informatique", niveau: "MASTER 1 S7", auteur: "Ahmed Benali" },
+  { id: 7, type: "Cours", titre: "Fiche de révision - Mécanique quantique", matiere: "Physique", niveau: "BACHELOR L3D - S5 D", auteur: "Prof. Martin" },
+  { id: 8, type: "Sujet", titre: "Partiel - Mécanique Quantique", matiere: "Physique", niveau: "BACHELOR L3D - S5 D", auteur: "Université" },
 ];
 
 const types = ["Tous", "Livre", "Cours", "Sujet", "Correction"];
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
-const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
+const niveaux = [
+  "Tous",
+  "BACHELOR ELECTRO.MAINTENANCE ENGINS LOURDS",
+  "BACHELOR TECHNO EMIH-EREE S1",
+  "BACHELOR TECHNO EMIH-EREE S2",
+  "BACHELOR TECHNO EMIH-EREE S3",
+  "BACHELOR TECHNO EMIH-EREE S4",
+  "BACHELOR TECHNO EMIH-EREE S5",
+  "BACHELOR TECHNO EMIH-EREE S6",
+  "BACHELOR TECHNO TOPO SIG S6 D",
+  "BACHELOR CENTRALE-2iE AFRICAN ANNEE 1",
+  "BACHELOR CENTRALE-2iE AFRICAN ANNEE 2",
+  "BACHELOR L1 - S1",
+  "BACHELOR L1 - S2",
+  "BACHELOR L2 - S3",
+  "BACHELOR L2 - S4",
+  "BACHELOR L3D - S5 D",
+  "BACHELOR L3D - S6 D",
+  "BACHELOR L3S - S5 S",
+  "COURS PREPA 1",
+  "COURS PREPA 2",
+  "CYCLE ING IIA S5D",
+  "CYCLE ING IIA S6",
+  "CYCLE ING IIA S7",
+  "CYCLE ING IIA S8",
+  "CYCLE ING IIA S9",
+  "MASTER SP ANC",
+  "MASTER SP WASH",
+  "MASTER 1 S7",
+  "MASTER 1 S8",
+  "MASTER 2 S9 GC - BTP",
+  "MASTER 2 S9 GEAAH",
+  "MASTER 2 S9 GEE",
+  "PROGRAMME DE MISE A NIVEAU"
+];
 
 export default function RecherchePage() {
   const [recherche, setRecherche] = useState("");
