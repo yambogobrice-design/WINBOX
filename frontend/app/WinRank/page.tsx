@@ -41,9 +41,7 @@ export default function WinRankPage() {
       <div className="border-b border-black/10 bg-gradient-to-br from-black/5 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-3xl">
-            <div className="inline-block px-4 py-2 bg-black/5 border border-black/10 rounded-full text-sm mb-4">
-              🏆 Classements
-            </div>
+            
             <h1 className="text-5xl font-bold mb-4">WinRank</h1>
             <p className="text-black/60 text-lg">
               Découvrez votre classement et comparez vos performances avec la communauté

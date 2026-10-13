@@ -269,9 +269,12 @@ export default function ProfilPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Niveau</label>
-                    <select className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors">
+                    <select 
+                      defaultValue="Licence 2"
+                      className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+                    >
                       <option>Licence 1</option>
-                      <option selected>Licence 2</option>
+                      <option>Licence 2</option>
                       <option>Licence 3</option>
                       <option>Master 1</option>
                       <option>Master 2</option>

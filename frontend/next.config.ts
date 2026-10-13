@@ -1,7 +1,63 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Optimisation des images
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60,
+  },
+  
+  // Compression
+  compress: true,
+  
+  // Optimisation du build
+  swcMinify: true,
+  
+  // Performance
+  reactStrictMode: true,
+  
+  // Optimisation des polices
+  optimizeFonts: true,
+  
+  // Désactiver le source map en production
+  productionBrowserSourceMaps: false,
+  
+  // Préchargement des scripts et optimisations
+  experimental: {
+    optimizePackageImports: ['react', 'react-dom'],
+    // Optimiser le CSS
+    optimizeCss: true,
+    // Précharger les liens pour une navigation plus rapide
+    scrollRestoration: true,
+  },
+  
+  // Optimisation du serveur
+  poweredByHeader: false,
+  
+  // Headers pour améliorer le cache et la performance
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

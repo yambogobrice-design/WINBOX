@@ -2,89 +2,30 @@
 import { useState } from "react";
 
 // Données de démonstration
-const corrections = [
-  {
-    id: 1,
-    titre: "Correction - Analyse Mathématique 2023",
-    sujetLie: "Examen Final - Analyse Mathématique",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    annee: "2023",
-    type: "Correction détaillée",
-    pages: 15,
-    telechargements: 1234,
-    note: 4.5,
-  },
-  {
-    id: 2,
-    titre: "Corrigé - Mécanique Quantique Partiel",
-    sujetLie: "Partiel - Mécanique Quantique",
-    matiere: "Physique",
-    niveau: "Licence 3",
-    annee: "2023",
-    type: "Corrigé type",
-    pages: 12,
-    telechargements: 789,
-    note: 4.7,
-  },
-  {
-    id: 3,
-    titre: "Solution complète - Algorithmes",
-    sujetLie: "Examen - Algorithmes et Structures de Données",
-    matiere: "Informatique",
-    niveau: "Licence 2",
-    annee: "2024",
-    type: "Solution commentée",
-    pages: 20,
-    telechargements: 1890,
-    note: 4.8,
-  },
-  {
-    id: 4,
-    titre: "Correction - Macroéconomie CC",
-    sujetLie: "Contrôle Continu - Macroéconomie",
-    matiere: "Économie",
-    niveau: "Licence 3",
-    annee: "2023",
-    type: "Correction détaillée",
-    pages: 8,
-    telechargements: 456,
-    note: 4.2,
-  },
-  {
-    id: 5,
-    titre: "Corrigé - Chimie Organique 2024",
-    sujetLie: "Examen Final - Chimie Organique",
-    matiere: "Chimie",
-    niveau: "Licence 2",
-    annee: "2024",
-    type: "Corrigé type",
-    pages: 18,
-    telechargements: 1123,
-    note: 4.6,
-  },
-  {
-    id: 6,
-    titre: "Solution - Droit Constitutionnel",
-    sujetLie: "Partiel - Droit Constitutionnel",
-    matiere: "Droit",
-    niveau: "Licence 1",
-    annee: "2023",
-    type: "Solution commentée",
-    pages: 10,
-    telechargements: 1567,
-    note: 4.4,
-  },
-];
+const corrections: {
+  id: number;
+  titre: string;
+  sujetLie: string;
+  matiere: string;
+  niveau: string;
+  filiere: string;
+  annee: string;
+  type: string;
+  pages: number;
+  telechargements: number;
+  note: number;
+}[] = [];
 
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
 const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
+const filieres = ["Toutes", "MPCI", "MPI", "MP", "BCG", "SVI", "MIAS", "MIPC", "Économie et Gestion", "Droit"];
 const types = ["Tous", "Correction détaillée", "Corrigé type", "Solution commentée"];
 
 export default function CorrectionsPage() {
   const [recherche, setRecherche] = useState("");
   const [matiereFiltre, setMatiereFiltre] = useState("Toutes");
   const [niveauFiltre, setNiveauFiltre] = useState("Tous");
+  const [filiereFiltre, setFiliereFiltre] = useState("Toutes");
   const [typeFiltre, setTypeFiltre] = useState("Tous");
 
   const correctionsFiltrees = corrections.filter((correction) => {
@@ -93,9 +34,10 @@ export default function CorrectionsPage() {
       correction.sujetLie.toLowerCase().includes(recherche.toLowerCase());
     const matchMatiere = matiereFiltre === "Toutes" || correction.matiere === matiereFiltre;
     const matchNiveau = niveauFiltre === "Tous" || correction.niveau === niveauFiltre;
+    const matchFiliere = filiereFiltre === "Toutes" || correction.filiere === filiereFiltre;
     const matchType = typeFiltre === "Tous" || correction.type === typeFiltre;
 
-    return matchRecherche && matchMatiere && matchNiveau && matchType;
+    return matchRecherche && matchMatiere && matchNiveau && matchFiliere && matchType;
   });
 
   return (
@@ -113,7 +55,7 @@ export default function CorrectionsPage() {
       {/* Filtres */}
       <div className="border-b border-black/10 bg-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Recherche */}
             <input
               type="text"
@@ -122,6 +64,19 @@ export default function CorrectionsPage() {
               onChange={(e) => setRecherche(e.target.value)}
               className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
             />
+
+            {/* Filière */}
+            <select
+              value={filiereFiltre}
+              onChange={(e) => setFiliereFiltre(e.target.value)}
+              className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+            >
+              {filieres.map((filiere) => (
+                <option key={filiere} value={filiere}>
+                  {filiere === "Toutes" ? "Toutes les filières" : filiere}
+                </option>
+              ))}
+            </select>
 
             {/* Matière */}
             <select
@@ -204,6 +159,7 @@ export default function CorrectionsPage() {
 
                     <div className="flex flex-wrap gap-2 mb-3">
                       <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{correction.type}</span>
+                      <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{correction.filiere}</span>
                       <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{correction.matiere}</span>
                       <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{correction.niveau}</span>
                       <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{correction.annee}</span>

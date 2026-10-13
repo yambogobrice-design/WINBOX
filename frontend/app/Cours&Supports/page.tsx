@@ -1,80 +1,30 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 
 // Données de démonstration
-const supports = [
-  {
-    id: 1,
-    titre: "Notes de cours - Analyse Mathématique",
-    type: "Notes de cours",
-    auteur: "Prof. Dupont",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    pages: 85,
-    telechargements: 567,
-  },
-  {
-    id: 2,
-    titre: "Fiche de révision - Mécanique quantique",
-    type: "Fiche de révision",
-    auteur: "Prof. Martin",
-    matiere: "Physique",
-    niveau: "Licence 3",
-    pages: 12,
-    telechargements: 892,
-  },
-  {
-    id: 3,
-    titre: "Travaux dirigés - Structures de données",
-    type: "TD",
-    auteur: "Prof. Benali",
-    matiere: "Informatique",
-    niveau: "Licence 2",
-    pages: 45,
-    telechargements: 1234,
-  },
-  {
-    id: 4,
-    titre: "Support PowerPoint - Macroéconomie",
-    type: "Présentation",
-    auteur: "Prof. Laurent",
-    matiere: "Économie",
-    niveau: "Licence 3",
-    pages: 68,
-    telechargements: 423,
-  },
-  {
-    id: 5,
-    titre: "Résumé de cours - Réactions chimiques",
-    type: "Résumé",
-    auteur: "Prof. Dubois",
-    matiere: "Chimie",
-    niveau: "Licence 1",
-    pages: 25,
-    telechargements: 678,
-  },
-  {
-    id: 6,
-    titre: "Cours complet - Droit des contrats",
-    type: "Cours complet",
-    auteur: "Prof. Rousseau",
-    matiere: "Droit",
-    niveau: "Licence 2",
-    pages: 120,
-    telechargements: 945,
-  },
-];
+const supports: {
+  id: number;
+  titre: string;
+  type: string;
+  auteur: string;
+  matiere: string;
+  niveau: string;
+  filiere: string;
+  pages: number;
+  telechargements: number;
+}[] = [];
 
 const types = ["Tous", "Notes de cours", "Fiche de révision", "TD", "Présentation", "Résumé", "Cours complet"];
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
 const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
+const filieres = ["Toutes", "MPCI", "MPI", "MP", "BCG", "SVI", "MIAS", "MIPC", "Économie et Gestion", "Droit"];
 
 export default function CoursSupportsPage() {
   const [recherche, setRecherche] = useState("");
   const [typeFiltre, setTypeFiltre] = useState("Tous");
   const [matiereFiltre, setMatiereFiltre] = useState("Toutes");
   const [niveauFiltre, setNiveauFiltre] = useState("Tous");
+  const [filiereFiltre, setFiliereFiltre] = useState("Toutes");
 
   const supportsFiltres = supports.filter((support) => {
     const matchRecherche =
@@ -83,8 +33,9 @@ export default function CoursSupportsPage() {
     const matchType = typeFiltre === "Tous" || support.type === typeFiltre;
     const matchMatiere = matiereFiltre === "Toutes" || support.matiere === matiereFiltre;
     const matchNiveau = niveauFiltre === "Tous" || support.niveau === niveauFiltre;
+    const matchFiliere = filiereFiltre === "Toutes" || support.filiere === filiereFiltre;
 
-    return matchRecherche && matchType && matchMatiere && matchNiveau;
+    return matchRecherche && matchType && matchMatiere && matchNiveau && matchFiliere;
   });
 
   return (
@@ -102,7 +53,7 @@ export default function CoursSupportsPage() {
       {/* Filtres */}
       <div className="border-b border-black/10 bg-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Recherche */}
             <input
               type="text"
@@ -111,6 +62,19 @@ export default function CoursSupportsPage() {
               onChange={(e) => setRecherche(e.target.value)}
               className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
             />
+
+            {/* Filière */}
+            <select
+              value={filiereFiltre}
+              onChange={(e) => setFiliereFiltre(e.target.value)}
+              className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+            >
+              {filieres.map((filiere) => (
+                <option key={filiere} value={filiere}>
+                  {filiere === "Toutes" ? "Toutes les filières" : filiere}
+                </option>
+              ))}
+            </select>
 
             {/* Type */}
             <select
@@ -194,6 +158,7 @@ export default function CoursSupportsPage() {
 
                       <div className="flex flex-wrap gap-2">
                         <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{support.type}</span>
+                        <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{support.filiere}</span>
                         <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{support.matiere}</span>
                         <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{support.niveau}</span>
                         <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{support.pages} pages</span>

@@ -1,72 +1,27 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 
 // Données de démonstration
-const livres = [
-  {
-    id: 1,
-    titre: "Mathématiques - Algèbre Linéaire",
-    auteur: "Jean Dupont",
-    niveau: "Licence 2",
-    matiere: "Mathématiques",
-    pages: 450,
-    telechargements: 1234,
-  },
-  {
-    id: 2,
-    titre: "Physique Quantique - Introduction",
-    auteur: "Marie Martin",
-    niveau: "Licence 3",
-    matiere: "Physique",
-    pages: 380,
-    telechargements: 892,
-  },
-  {
-    id: 3,
-    titre: "Programmation Python Avancée",
-    auteur: "Ahmed Benali",
-    niveau: "Master 1",
-    matiere: "Informatique",
-    pages: 520,
-    telechargements: 2156,
-  },
-  {
-    id: 4,
-    titre: "Analyse Financière",
-    auteur: "Sophie Laurent",
-    niveau: "Licence 3",
-    matiere: "Économie",
-    pages: 320,
-    telechargements: 678,
-  },
-  {
-    id: 5,
-    titre: "Chimie Organique",
-    auteur: "Pierre Dubois",
-    niveau: "Licence 2",
-    matiere: "Chimie",
-    pages: 410,
-    telechargements: 945,
-  },
-  {
-    id: 6,
-    titre: "Droit Constitutionnel",
-    auteur: "Claire Rousseau",
-    niveau: "Licence 1",
-    matiere: "Droit",
-    pages: 280,
-    telechargements: 1567,
-  },
-];
+const livres: {
+  id: number;
+  titre: string;
+  auteur: string;
+  niveau: string;
+  matiere: string;
+  filiere: string;
+  pages: number;
+  telechargements: number;
+}[] = [];
 
 const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
+const filieres = ["Toutes", "MPCI", "MPI", "MP", "BCG", "SVI", "MIAS", "MIPC", "Économie et Gestion", "Droit"];
 
 export default function LivresPage() {
   const [recherche, setRecherche] = useState("");
   const [niveauFiltre, setNiveauFiltre] = useState("Tous");
   const [matiereFiltre, setMatiereFiltre] = useState("Toutes");
+  const [filiereFiltre, setFiliereFiltre] = useState("Toutes");
 
   const livresFiltres = livres.filter((livre) => {
     const matchRecherche =
@@ -74,8 +29,9 @@ export default function LivresPage() {
       livre.auteur.toLowerCase().includes(recherche.toLowerCase());
     const matchNiveau = niveauFiltre === "Tous" || livre.niveau === niveauFiltre;
     const matchMatiere = matiereFiltre === "Toutes" || livre.matiere === matiereFiltre;
+    const matchFiliere = filiereFiltre === "Toutes" || livre.filiere === filiereFiltre;
 
-    return matchRecherche && matchNiveau && matchMatiere;
+    return matchRecherche && matchNiveau && matchMatiere && matchFiliere;
   });
 
   return (
@@ -93,7 +49,7 @@ export default function LivresPage() {
       {/* Filtres et recherche */}
       <div className="border-b border-black/10 bg-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Recherche */}
             <div className="md:col-span-2">
               <input
@@ -104,6 +60,19 @@ export default function LivresPage() {
                 className="w-full px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
               />
             </div>
+
+            {/* Filtre Filière */}
+            <select
+              value={filiereFiltre}
+              onChange={(e) => setFiliereFiltre(e.target.value)}
+              className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+            >
+              {filieres.map((filiere) => (
+                <option key={filiere} value={filiere}>
+                  {filiere === "Toutes" ? "Toutes les filières" : filiere}
+                </option>
+              ))}
+            </select>
 
             {/* Filtre Niveau */}
             <select
@@ -170,6 +139,7 @@ export default function LivresPage() {
               <p className="text-sm text-black/60 mb-4">Par {livre.auteur}</p>
 
               <div className="flex flex-wrap gap-2 mb-4">
+                <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{livre.filiere}</span>
                 <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{livre.niveau}</span>
                 <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{livre.matiere}</span>
               </div>

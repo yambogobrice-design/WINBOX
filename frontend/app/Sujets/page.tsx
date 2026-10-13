@@ -2,86 +2,38 @@
 import { useState } from "react";
 
 // Données de démonstration
-const sujets = [
-  {
-    id: 1,
-    titre: "Examen Final - Analyse Mathématique",
-    matiere: "Mathématiques",
-    niveau: "Licence 2",
-    annee: "2023",
-    session: "Session 1",
-    duree: "3h",
-    telechargements: 1456,
-  },
-  {
-    id: 2,
-    titre: "Partiel - Mécanique Quantique",
-    matiere: "Physique",
-    niveau: "Licence 3",
-    annee: "2023",
-    session: "Session 2",
-    duree: "2h",
-    telechargements: 892,
-  },
-  {
-    id: 3,
-    titre: "Examen - Algorithmes et Structures de Données",
-    matiere: "Informatique",
-    niveau: "Licence 2",
-    annee: "2024",
-    session: "Session 1",
-    duree: "3h",
-    telechargements: 2103,
-  },
-  {
-    id: 4,
-    titre: "Contrôle Continu - Macroéconomie",
-    matiere: "Économie",
-    niveau: "Licence 3",
-    annee: "2023",
-    session: "Session 1",
-    duree: "1h30",
-    telechargements: 645,
-  },
-  {
-    id: 5,
-    titre: "Examen Final - Chimie Organique",
-    matiere: "Chimie",
-    niveau: "Licence 2",
-    annee: "2024",
-    session: "Session 2",
-    duree: "2h30",
-    telechargements: 1234,
-  },
-  {
-    id: 6,
-    titre: "Partiel - Droit Constitutionnel",
-    matiere: "Droit",
-    niveau: "Licence 1",
-    annee: "2023",
-    session: "Session 1",
-    duree: "2h",
-    telechargements: 1789,
-  },
-];
+const sujets: {
+  id: number;
+  titre: string;
+  matiere: string;
+  niveau: string;
+  filiere: string;
+  annee: string;
+  session: string;
+  duree: string;
+  telechargements: number;
+}[] = [];
 
 const matieres = ["Toutes", "Mathématiques", "Physique", "Informatique", "Économie", "Chimie", "Droit"];
 const niveaux = ["Tous", "Licence 1", "Licence 2", "Licence 3", "Master 1", "Master 2"];
+const filieres = ["Toutes", "MPCI", "MPI", "MP", "BCG", "SVI", "MIAS", "MIPC", "Économie et Gestion", "Droit"];
 const annees = ["Toutes", "2024", "2023", "2022", "2021"];
 
 export default function SujetsPage() {
   const [recherche, setRecherche] = useState("");
   const [matiereFiltre, setMatiereFiltre] = useState("Toutes");
   const [niveauFiltre, setNiveauFiltre] = useState("Tous");
+  const [filiereFiltre, setFiliereFiltre] = useState("Toutes");
   const [anneeFiltre, setAnneeFiltre] = useState("Toutes");
 
   const sujetsFiltres = sujets.filter((sujet) => {
     const matchRecherche = sujet.titre.toLowerCase().includes(recherche.toLowerCase());
     const matchMatiere = matiereFiltre === "Toutes" || sujet.matiere === matiereFiltre;
     const matchNiveau = niveauFiltre === "Tous" || sujet.niveau === niveauFiltre;
+    const matchFiliere = filiereFiltre === "Toutes" || sujet.filiere === filiereFiltre;
     const matchAnnee = anneeFiltre === "Toutes" || sujet.annee === anneeFiltre;
 
-    return matchRecherche && matchMatiere && matchNiveau && matchAnnee;
+    return matchRecherche && matchMatiere && matchNiveau && matchFiliere && matchAnnee;
   });
 
   return (
@@ -99,7 +51,7 @@ export default function SujetsPage() {
       {/* Filtres */}
       <div className="border-b border-black/10 bg-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Recherche */}
             <input
               type="text"
@@ -108,6 +60,19 @@ export default function SujetsPage() {
               onChange={(e) => setRecherche(e.target.value)}
               className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
             />
+
+            {/* Filière */}
+            <select
+              value={filiereFiltre}
+              onChange={(e) => setFiliereFiltre(e.target.value)}
+              className="px-4 py-2 bg-white border border-black/10 rounded-md focus:outline-none focus:border-black/30 transition-colors"
+            >
+              {filieres.map((filiere) => (
+                <option key={filiere} value={filiere}>
+                  {filiere === "Toutes" ? "Toutes les filières" : filiere}
+                </option>
+              ))}
+            </select>
 
             {/* Matière */}
             <select
@@ -186,6 +151,7 @@ export default function SujetsPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-2">{sujet.titre}</h3>
                   <div className="flex flex-wrap gap-2 mb-3">
+                    <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{sujet.filiere}</span>
                     <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{sujet.matiere}</span>
                     <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{sujet.niveau}</span>
                     <span className="px-2 py-1 bg-black/5 text-xs rounded-md">{sujet.annee}</span>
