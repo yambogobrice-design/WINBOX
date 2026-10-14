@@ -151,6 +151,7 @@ const NavBar = () => {
                             src="/Photo.png"
                             alt="Créateur WinBox"
                             fill
+                            sizes="40px"
                             className="object-cover"
                           />
                         </div>

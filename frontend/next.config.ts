@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Qualités autorisées (Next 16 : 75 par défaut). 85 est utilisé pour les logos.
+    qualities: [75, 85],
     minimumCacheTTL: 60,
   },
   
@@ -21,8 +23,6 @@ const nextConfig: NextConfig = {
   // Préchargement des scripts et optimisations
   experimental: {
     optimizePackageImports: ['react', 'react-dom'],
-    // Optimiser le CSS
-    optimizeCss: true,
     // Précharger les liens pour une navigation plus rapide
     scrollRestoration: true,
   },
