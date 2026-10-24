@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "WINBOX - Plateforme académique pour étudiants",
+    default: "WINBOX",
     template: "%s | WINBOX"
   },
   description: "WinBox est une plateforme académique conçue pour aider les étudiants à mieux préparer leurs examens et à progresser dans leurs études. Accédez à des cours, livres, sujets et corrections.",
