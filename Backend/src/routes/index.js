@@ -5,8 +5,6 @@ import userRoutes from './userRoutes.js';
 import resourceRoutes from './resourceRoutes.js';
 import favoriteRoutes from './favoriteRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
-import leaderboardRoutes from './leaderboardRoutes.js';
-import winzoneRoutes from './winzoneRoutes.js';
 import adminRoutes from './adminRoutes.js';
 import categoryRoutes from './categoryRoutes.js';
 import badgeRoutes from './badgeRoutes.js';
@@ -22,8 +20,6 @@ router.use('/users', userRoutes);
 router.use('/resources', resourceRoutes);
 router.use('/favorites', favoriteRoutes);
 router.use('/notifications', notificationRoutes);
-router.use('/leaderboard', leaderboardRoutes);
-router.use('/winzone', winzoneRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/badges', badgeRoutes);
 router.use('/admin', adminRoutes);
@@ -39,8 +35,6 @@ router.get('/', (req, res) => {
       resources: '/resources',
       favorites: '/favorites',
       notifications: '/notifications',
-      leaderboard: '/leaderboard',
-      winzone: '/winzone',
       categories: '/categories',
       badges: '/badges',
       admin: '/admin'

@@ -21,7 +21,7 @@ const verifierSchema = async () => {
   const tables = await query('SHOW TABLES');
   const noms = tables.map((ligne) => Object.values(ligne)[0]);
 
-  const attendues = ['users', 'categories', 'resources', 'favorites', 'badges', 'challenges', 'activities'];
+  const attendues = ['users', 'categories', 'resources', 'favorites', 'badges', 'activities'];
   const manquantes = attendues.filter((table) => !noms.includes(table));
 
   if (manquantes.length > 0) {
@@ -59,7 +59,6 @@ const creerAdmin = async () => {
 
   const [categories] = await query('SELECT COUNT(*) AS total FROM categories');
   const [badges] = await query('SELECT COUNT(*) AS total FROM badges');
-  const [defis] = await query('SELECT COUNT(*) AS total FROM challenges');
 
   console.log('\n╔═══════════════════════════════════════════╗');
   console.log('║         ✅ BASE DE DONNÉES PRÊTE          ║');
@@ -67,8 +66,7 @@ const creerAdmin = async () => {
   console.log(`👤 Administrateur : ${admin.email} (id ${admin.id}, ${admin.role}, ${admin.status})`);
   console.log(`🔑 Mot de passe   : ${process.env.ADMIN_PASSWORD ? '(défini par ADMIN_PASSWORD)' : ADMIN_PASSWORD}`);
   console.log(`📚 Matières       : ${categories.total}`);
-  console.log(`🏅 Badges         : ${badges.total}`);
-  console.log(`🎯 Défis          : ${defis.total}\n`);
+  console.log(`🏅 Badges         : ${badges.total}\n`);
 
   if (!process.env.ADMIN_PASSWORD) {
     console.log('⚠️  Changez ce mot de passe par défaut avant toute mise en ligne.\n');

@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- ============================================
 -- TABLE: activities (fil d'activité, historique de points)
--- Alimente « Activité récente » du profil et WinRank (filtres matière/période)
+-- Alimente « Activité récente » du profil
 -- ============================================
 CREATE TABLE IF NOT EXISTS activities (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -259,81 +259,6 @@ CREATE TABLE IF NOT EXISTS user_badges (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_badge (user_id, badge_id),
-    INDEX idx_user (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================
--- TABLE: study_sessions (heures d'étude — WinZone)
--- ============================================
-CREATE TABLE IF NOT EXISTS study_sessions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    category_id INT NULL,
-    duree_minutes INT NOT NULL,
-    note VARCHAR(255),
-    date_session DATE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
-    INDEX idx_user (user_id),
-    INDEX idx_date (date_session),
-    INDEX idx_category (category_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================
--- TABLE: objectives (objectifs d'étude — WinZone)
--- ============================================
-CREATE TABLE IF NOT EXISTS objectives (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    titre VARCHAR(255) NOT NULL,
-    category_id INT NULL,
-    date_debut DATE,
-    date_echeance DATE,
-    objectif_heures INT DEFAULT 0,
-    progression TINYINT UNSIGNED DEFAULT 0,   -- 0..100
-    statut ENUM('en_cours', 'termine', 'en_retard') DEFAULT 'en_cours',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
-    INDEX idx_user (user_id),
-    INDEX idx_statut (statut),
-    INDEX idx_echeance (date_echeance)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================
--- TABLE: challenges (défis) + user_challenges (progression)
--- ============================================
-CREATE TABLE IF NOT EXISTS challenges (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titre VARCHAR(255) NOT NULL,
-    description TEXT,
-    type ENUM('quotidien', 'hebdomadaire', 'mensuel') DEFAULT 'hebdomadaire',
-    points INT DEFAULT 0,
-    objectif INT DEFAULT 1,               -- valeur à atteindre
-    category_id INT NULL,
-    date_debut DATE,
-    date_fin DATE,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
-    INDEX idx_type (type),
-    INDEX idx_active (is_active)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS user_challenges (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    challenge_id INT NOT NULL,
-    progression INT DEFAULT 0,
-    termine BOOLEAN DEFAULT FALSE,
-    completed_at TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_challenge (user_id, challenge_id),
     INDEX idx_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -424,20 +349,6 @@ JOIN users u ON r.user_id = u.id
 LEFT JOIN categories c ON r.category_id = c.id
 WHERE r.status = 'validee' AND r.is_active = TRUE;
 
--- Classement général (hors utilisateurs suspendus/inactifs)
-CREATE OR REPLACE VIEW v_classement AS
-SELECT
-    u.id,
-    CONCAT(u.prenom, ' ', u.nom) AS nom,
-    u.niveau,
-    u.filiere,
-    u.points,
-    u.role,
-    (SELECT COUNT(*) FROM quiz_attempts qa WHERE qa.user_id = u.id) AS quiz_completes,
-    (SELECT ROUND(AVG(qa.percentage), 0) FROM quiz_attempts qa WHERE qa.user_id = u.id) AS taux_reussite
-FROM users u
-WHERE u.status = 'actif';
-
 -- ============================================
 -- DONNÉES INITIALES
 -- ============================================
@@ -459,11 +370,5 @@ INSERT IGNORE INTO badges (nom, slug, description, icon, condition_type, conditi
 ('Perfectionniste', 'perfectionniste', '95 % de réussite aux quiz', '🏆', 'taux_reussite', 95, 4),
 ('Généreux', 'genereux', '10 contributions validées', '❤️', 'contributions', 10, 5),
 ('Studieux', 'studieux', '100 téléchargements cumulés', '📚', 'telechargements', 100, 6);
-
-INSERT IGNORE INTO challenges (titre, description, type, points, objectif, date_debut, date_fin) VALUES
-('Réviser 5 jours de suite', 'Se connecter et travailler au moins une session par jour pendant 5 jours', 'hebdomadaire', 50, 5, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY)),
-('Télécharger 3 ressources', 'Télécharger trois ressources pour préparer ses examens', 'hebdomadaire', 30, 3, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY)),
-('Publier une contribution', 'Partager un cours, un sujet ou une correction avec la communauté', 'mensuel', 100, 1, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY)),
-('Terminer 2 objectifs', 'Atteindre 100 % sur deux objectifs d''étude', 'mensuel', 80, 2, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY));
 
 SELECT 'Base de données WinBox (v2) créée avec succès !' AS message;

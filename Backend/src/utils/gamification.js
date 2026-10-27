@@ -14,10 +14,7 @@ export const BAREME = {
   telechargement: 1,
   quiz: 10,
   contribution_soumise: 5,
-  contribution_validee: 50,
-  objectif_termine: 25,
-  defi_termine: 40,
-  session_etude: 5
+  contribution_validee: 50
 };
 
 // ============================================
@@ -94,8 +91,7 @@ export const verifierEtAttribuerBadges = async (userId) => {
 
 /**
  * Ajoute des points à un utilisateur et trace l'activité correspondante.
- * L'activité alimente « Activité récente » (profil) et les filtres
- * matière/période de WinRank.
+ * L'activité alimente « Activité récente » du profil.
  *
  * @param {number} userId
  * @param {object} options

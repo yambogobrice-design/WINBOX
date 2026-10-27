@@ -54,8 +54,6 @@ Next.js précharge automatiquement les pages dans ces cas :
 - ✅ Cours & Supports (`/Cours&Supports`)
 - ✅ Sujets (`/Sujets`)
 - ✅ Corrections (`/Corrections`)
-- ✅ WinZone (`/WinZone`)
-- ✅ WinRank (`/WinRank`)
 - ✅ Recherche (`/Recherche`)
 - ✅ À propos (`/Apropos`)
 - ✅ Contribuer (`/Contribuer`)

@@ -32,7 +32,6 @@ export const statistiquesUtilisateur = async (userId) => {
        (SELECT ROUND(AVG(qa.percentage), 0) FROM quiz_attempts qa WHERE qa.user_id = u.id) AS taux_reussite,
        (SELECT COUNT(*) FROM user_badges ub WHERE ub.user_id = u.id) AS badges,
        (SELECT COUNT(*) FROM favorites f WHERE f.user_id = u.id) AS favoris,
-       (SELECT COALESCE(SUM(ss.duree_minutes), 0) FROM study_sessions ss WHERE ss.user_id = u.id) AS minutes_etude,
        (SELECT COUNT(*) + 1 FROM users u2
          WHERE u2.status = 'actif' AND u2.points > u.points) AS rang
      FROM users u

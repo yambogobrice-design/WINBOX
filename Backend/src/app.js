@@ -123,8 +123,6 @@ app.get('/', (req, res) => {
       `${API_PREFIX}/resources`,
       `${API_PREFIX}/favorites`,
       `${API_PREFIX}/notifications`,
-      `${API_PREFIX}/leaderboard`,
-      `${API_PREFIX}/winzone`,
       `${API_PREFIX}/categories`,
       `${API_PREFIX}/badges`,
       `${API_PREFIX}/admin`

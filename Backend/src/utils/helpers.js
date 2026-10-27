@@ -142,7 +142,7 @@ export const formatFileSize = (bytes) => {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
 
-// Nombre de jours d'une période (WinRank / Dashboard admin)
+// Nombre de jours d'une période (Dashboard admin)
 export const periodeEnJours = (periode, defaut = 30) => {
   const correspondances = {
     "aujourd'hui": 1,

@@ -17,7 +17,6 @@ const ROUTES_PUBLIQUES = new Set([
   'POST /auth/reset-password',
   'GET /resources',
   'GET /resources/:id',
-  'GET /leaderboard',
   'GET /categories',
   'GET /categories/:slug',
   'GET /badges'
@@ -57,17 +56,7 @@ const CORPS_EXEMPLE = {
   'PUT /resources/:id': { titre: 'Titre corrigé', description: 'Description mise à jour' },
   'POST /favorites': { resource_id: 1 },
   'PATCH /admin/resources/:id/status': { status: 'validee', comment: 'Contenu conforme' },
-  'PATCH /admin/users/:id': { role: 'contributeur', status: 'actif' },
-  'POST /winzone/objectives': {
-    titre: 'Maîtriser les intégrales',
-    matiere: 'mathematiques',
-    dateDebut: '2026-10-01',
-    dateEcheance: '2026-10-31',
-    objectifHeures: 12
-  },
-  'PATCH /winzone/objectives/:id': { progression: 50 },
-  'PATCH /winzone/challenges/:id/progress': { progression: 3 },
-  'POST /winzone/sessions': { matiere: 'mathematiques', dureeMinutes: 90, note: 'Révision du chapitre 3' }
+  'PATCH /admin/users/:id': { role: 'contributeur', status: 'actif' }
 };
 
 const libellesParametres = {

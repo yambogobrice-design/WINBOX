@@ -222,47 +222,7 @@ reçue/validée/refusée, mot de passe modifié/réinitialisé.
 
 ---
 
-## 8. Classement — `/leaderboard` (WinRank)
-
-| Méthode | Chemin | Accès | Description |
-|---|---|---|---|
-| GET | `/leaderboard` | Public | Classement (`?matiere=&periode=&page=&limit=`) |
-| GET | `/leaderboard/me` | Connecté | Mon rang |
-
-- `matiere` : `Général` (défaut) ou une matière.
-- `periode` : `Aujourd'hui` \| `Cette semaine` \| `Ce mois` (défaut) \| `Tout temps`
-  (`7j`, `30j`, `90j` acceptés).
-
-« Tout temps » classe sur les points cumulés ; une période bornée classe sur les
-points **gagnés pendant la période** (table `activities`). Chaque entrée contient
-`rang`, `nom`, `niveau`, `filiere`, `points`, `pointsTotal`, `quizCompletes`,
-`tauxReussite`. Le champ `moi` (utilisateur connecté) est ajouté si authentifié.
-
----
-
-## 9. WinZone — `/winzone`
-
-| Méthode | Chemin | Description |
-|---|---|---|
-| GET | `/winzone/overview` | Statistiques générales (heures, objectifs, défis, progression) |
-| GET | `/winzone/objectives` | Mes objectifs (`?statut=`) |
-| POST | `/winzone/objectives` | `{ titre, matiere, dateDebut, dateEcheance, objectifHeures }` |
-| PATCH | `/winzone/objectives/:id` | `{ progression }` (100 ⇒ terminé, +25 points) ou `{ statut }` |
-| DELETE | `/winzone/objectives/:id` | Supprimer |
-| GET | `/winzone/subjects` | Matières travaillées (heures, objectif, dernier accès) |
-| GET | `/winzone/recommendations` | Sujets recommandés (`pertinence`, `raison`) |
-| GET | `/winzone/challenges` | Défis actifs + ma progression |
-| POST | `/winzone/challenges/:id/join` | Rejoindre un défi |
-| PATCH | `/winzone/challenges/:id/progress` | `{ progression }` ; objectif atteint ⇒ points |
-| GET | `/winzone/sessions` | Mes sessions d'étude |
-| POST | `/winzone/sessions` | `{ matiere, dureeMinutes (1-1440), note, date }` (+5 points) |
-| DELETE | `/winzone/sessions/:id` | Supprimer |
-
-Un objectif `en_cours` dont l'échéance est dépassée est renvoyé `en_retard`.
-
----
-
-## 10. Administration — `/admin` (rôle `admin` requis)
+## 8. Administration — `/admin` (rôle `admin` requis)
 
 | Méthode | Chemin | Description |
 |---|---|---|
@@ -282,7 +242,7 @@ ainsi que `ressourcesPopulaires` (top 5) et `actionsEnAttente`.
 
 ---
 
-## 11. Correspondance avec les pages du frontend
+## 9. Correspondance avec les pages du frontend
 
 | Page / composant | Endpoints |
 |---|---|
@@ -299,8 +259,6 @@ ainsi que `ressourcesPopulaires` (top 5) et `actionsEnAttente`.
 | `Contribuer` | `POST /resources` (multipart), `GET /resources/mine` |
 | `Livres` / `Cours&Supports` / `Sujets` / `Corrections` | `GET /resources?type=…`, `GET /categories` |
 | `Recherche` | `GET /resources?search=…` (+ filtres) |
-| `WinRank` | `GET /leaderboard`, `GET /leaderboard/me` |
-| `WinZone` | `/winzone/*` |
 | `Admin/Dashboard` | `GET /admin/stats`, `GET /admin/activity`, `GET /admin/pending` |
 | `Admin/Gestion_utilisateurs` | `GET /admin/users`, `PATCH /admin/users/:id`, `DELETE /admin/users/:id` |
 | `Admin/Gestion_ressources` | `GET /admin/resources`, `PATCH /admin/resources/:id/status` |
@@ -316,7 +274,7 @@ ainsi que `ressourcesPopulaires` (top 5) et `actionsEnAttente`.
 
 ---
 
-## 12. Vérifications
+## 10. Vérifications
 
 ```bash
 npm run verify   # syntaxe, imports/exports, cohérence SQL, inventaire des routes
@@ -327,7 +285,7 @@ Le script `scripts/verifier-code.mjs` ne nécessite ni `node_modules` ni MySQL.
 
 ---
 
-## 13. Limites connues / suite
+## 11. Limites connues / suite
 
 - **Aucun transport email** : `forgot-password` journalise le lien. Brancher un
   service (SMTP, Resend…) dans `authController.forgotPassword`.

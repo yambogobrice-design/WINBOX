@@ -107,7 +107,7 @@ Backend/
 │   │   ├── database.js       pool MySQL
 │   │   └── database.sql      schéma complet (v2)
 │   ├── controllers/          auth, users, resources, favorites, catalogue,
-│   │                         notifications, leaderboard, winzone, admin
+│   │                         notifications, admin
 │   ├── middlewares/          auth (rôles), validation, erreurs, upload,
 │   │                         normalisation des champs français
 │   ├── routes/               un routeur par domaine + index.js
@@ -129,19 +129,16 @@ Backend/
 | Favoris | `/api/v1/favorites` | liste, ajout, retrait |
 | Catalogue | `/api/v1/categories`, `/api/v1/badges` | matières et badges |
 | Notifications | `/api/v1/notifications` | lecture, marquage |
-| Classement | `/api/v1/leaderboard` | WinRank (matière + période) |
-| WinZone | `/api/v1/winzone` | objectifs, sessions, défis, recommandations |
 | Administration | `/api/v1/admin` | tableau de bord, utilisateurs, modération |
 
-55 routes au total — détail dans [API.md](./API.md).
+44 routes au total — détail dans [API.md](./API.md).
 
 ## 🗄️ Base de données
 
-**19 tables** : `users`, `password_resets`, `categories`, `resources`, `favorites`,
+**15 tables** : `users`, `password_resets`, `categories`, `resources`, `favorites`,
 `ratings`, `downloads`, `comments`, `notifications`, `activities`, `badges`,
-`user_badges`, `study_sessions`, `objectives`, `challenges`, `user_challenges`,
-`quiz`, `quiz_questions`, `quiz_attempts` — plus 2 vues
-(`v_ressources_publiques`, `v_classement`).
+`user_badges`, `quiz`, `quiz_questions`, `quiz_attempts` — plus 1 vue
+(`v_ressources_publiques`).
 
 Relations principales :
 
@@ -149,14 +146,12 @@ Relations principales :
 users (1) ─────< (N) resources          categories (1) ─< (N) resources
 users (1) ─────< (N) favorites          resources  (1) ─< (N) downloads
 users (1) ─────< (N) activities         resources  (1) ─< (N) favorites
-users (1) ─────< (N) study_sessions     resources  (1) ─< (N) ratings
-users (1) ─────< (N) objectives         quiz       (1) ─< (N) quiz_questions
-users (1) ─────< (N) user_challenges    quiz       (1) ─< (N) quiz_attempts
+users (1) ─────< (N) user_badges        resources  (1) ─< (N) ratings
+users (1) ─────< (N) quiz_attempts      quiz       (1) ─< (N) quiz_questions
 ```
 
 Points de gamification (`src/utils/gamification.js`) : inscription +20,
-téléchargement +1, contribution soumise +5, contribution validée +50,
-objectif terminé +25, défi relevé +40, session d'étude +5.
+téléchargement +1, quiz +10, contribution soumise +5, contribution validée +50.
 Les badges sont attribués automatiquement dès que leur condition est remplie.
 
 ## 🔒 Sécurité
@@ -181,8 +176,6 @@ Les badges sont attribués automatiquement dès que leur condition est remplie.
 ✅ Favoris
 ✅ Recherche et filtres avancés + pagination
 ✅ Catalogue des matières et des badges
-✅ Classement WinRank (par matière et par période)
-✅ WinZone : objectifs, sessions d'étude, défis, recommandations
 ✅ Tableau de bord et gestion des utilisateurs pour l'administration
 ✅ Gamification (points, badges, fil d'activité)
 

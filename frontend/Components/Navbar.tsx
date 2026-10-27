@@ -365,18 +365,6 @@ const NavBar = () => {
                 Communauté
               </p>
             </div>
-            <Link prefetch={true} href="/WinZone"
-              onClick={fermerMenu}
-              className="block px-4 py-3 text-sm hover:bg-black/5 rounded-md transition-all"
-            >
-              WinZone
-            </Link>
-            <Link prefetch={true} href="/WinRank"
-              onClick={fermerMenu}
-              className="block px-4 py-3 text-sm hover:bg-black/5 rounded-md transition-all"
-            >
-              WinRank
-            </Link>
             <Link prefetch={true} href="/Recherche"
               onClick={fermerMenu}
               className="block px-4 py-3 text-sm hover:bg-black/5 rounded-md transition-all"

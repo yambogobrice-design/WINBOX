@@ -35,7 +35,6 @@ export interface StatsUtilisateur {
   taux_reussite: number | null;
   badges: number;
   favoris: number;
-  minutes_etude: number;
   rang: number;
 }
 
